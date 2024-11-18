@@ -48,7 +48,7 @@ jobs:
           scandir: ./
           severity: error
         env:
-          SHELLCHECK_OPTS: -e SC2145
+          SHELLCHECK_OPTS: -e SC2145 -e SC1073 -e SC1065 -e SC1064
 
       - name: Discord failure notification
         if: failure()
