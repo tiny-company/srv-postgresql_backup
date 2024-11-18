@@ -1,0 +1,136 @@
+name: postgresql_backup service cicd
+run-name: postgresql_backup service cicd
+
+on:
+  push:
+  pull_request:
+
+env:
+  IMAGE_NAME: postgresql_backup
+  REGISTRY: docker.io
+  ORGANIZATION: tinycompany
+
+jobs:
+  yamllint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: yamllint
+        uses: karancode/yamllint-github-action@master
+        with:
+          yamllint_file_or_dir: ./resticprofile/
+          yamllint_strict: false
+          yamllint_comment: true
+          yamllint_config_filepath: "./.yamllint/.yamllint_conf"
+
+      - name: Discord failure notification
+        if: failure()
+        id: DiscordFail
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_BACKUP }}
+        uses: Ilshidur/action-discord@master
+
+  shellcheck:
+    needs: yamllint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Run ShellCheck
+        uses: ludeeus/action-shellcheck@master
+        with:
+          scandir: ./
+          severity: error
+        env:
+          SHELLCHECK_OPTS: -e SC2145
+
+      - name: Discord failure notification
+        if: failure()
+        id: DiscordFail
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_BACKUP }}
+        uses: Ilshidur/action-discord@master
+
+  build:
+    needs: shellcheck
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      ## use for incremental version
+      - name: Get next version
+        uses: reecetech/version-increment@2023.3.1
+        id: version
+        with:
+          scheme: semver
+          increment: patch
+
+      - name: Extract metadata (tags, labels) for Docker
+        if: github.event_name != 'pull_request'
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+
+      # logging in to dockerhub
+      - name: Login to dockerhub registry
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ secrets.DOCKER_USER }}
+          password: ${{ secrets.DOCKER_TOKEN }}
+          logout: true
+
+      # build and push image with incremental version
+      - name: Build and push image to private docker registry (push trigger)
+        if: github.event_name != 'pull_request'
+        uses: docker/build-push-action@v4
+        with:
+          no-cache: true
+          context: "."
+          file: ./Dockerfile
+          push: true
+          labels: ${{ steps.meta.outputs.labels }}
+          tags: ${{ env.REGISTRY }}/${{ env.ORGANIZATION }}/${{ env.IMAGE_NAME }}:${{ steps.version.outputs.version }},${{ env.REGISTRY }}/${{ env.ORGANIZATION }}/${{ env.IMAGE_NAME }}:latest
+
+      - name: Increment current tag version
+        if: success()
+        uses: actions/github-script@v5
+        with:
+          script: |
+            github.rest.git.createRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: 'refs/tags/${{ steps.version.outputs.version }}',
+              sha: context.sha
+            })
+
+      - name: Discord failure notification
+        if: failure()
+        id: DiscordFail
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_BACKUP }}
+        uses: Ilshidur/action-discord@master
+
+  notify:
+    needs: [yamllint, shellcheck, build]
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Discord failure notification
+        id: DiscordSuccess
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_BACKUP }}
+        uses: Ilshidur/action-discord@master

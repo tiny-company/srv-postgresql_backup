@@ -1,0 +1,12 @@
+failure-threshold: error               # name of threshold level (error | warning | info | style | ignore | none)
+format: tty                          # Output format (tty | json | checkstyle | codeclimate | gitlab_codeclimate | gnu | codacy)
+ignored:
+  - DL3025
+  - DL3009
+  - DL3008
+no-color: false                       # true | false
+no-fail: false                        # true | false
+strict-labels: false                  # true | false
+disable-ignore-pragma: false          # true | false
+trustedRegistries:
+  - docker.io    # registry or list of registries

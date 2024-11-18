@@ -1,0 +1,12 @@
+---
+extends: default
+
+rules:
+  document-start: {present: false}
+  line-length:
+    max: 180
+    level: warning
+
+ignore: |
+  roles/
+  ansible/

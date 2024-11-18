@@ -1,0 +1,5 @@
+imgs/
+docker-compose.yml
+.env-example
+Dockerfile
+readme.md
