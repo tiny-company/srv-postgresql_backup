@@ -31,6 +31,9 @@ jobs:
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_BACKUP }}
         uses: Ilshidur/action-discord@master
+        with:
+          args: 'The project {{ EVENT_PAYLOAD.repository.full_name }} has fail at step ${{ job.name }}. see more at : https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}'
+
 
   shellcheck:
     needs: yamllint
@@ -53,6 +56,9 @@ jobs:
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_BACKUP }}
         uses: Ilshidur/action-discord@master
+        with:
+          args: 'The project {{ EVENT_PAYLOAD.repository.full_name }} has fail at step ${{ job.name }}. see more at : https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}'
+
 
   build:
     needs: shellcheck
@@ -120,6 +126,9 @@ jobs:
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_BACKUP }}
         uses: Ilshidur/action-discord@master
+        with:
+          args: 'The project {{ EVENT_PAYLOAD.repository.full_name }} has fail at step ${{ job.name }}. see more at : https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}'
+
 
   notify:
     needs: [yamllint, shellcheck, build]
@@ -134,3 +143,5 @@ jobs:
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_BACKUP }}
         uses: Ilshidur/action-discord@master
+        with:
+          args: 'The project {{ EVENT_PAYLOAD.repository.full_name }} successfully finished. see more at : https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}'
