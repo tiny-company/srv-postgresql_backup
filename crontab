@@ -1,0 +1,1 @@
+0 1 * * * srv/main_postgresql_backup.sh >> 2>&1

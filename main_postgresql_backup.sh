@@ -2,10 +2,10 @@
 
 # ------------------------------------------------------------------
 # - Filename: main_postgresql_backup.sh
-# - Author : infra-02
-# - Dependency : logs.sh
+# - Author : ottomatic
+# - Dependency : logs.sh, postgresql_backup.sh
 # - Description : script that backup a postgresql database.
-# - Creation date   :2024-11-18
+# - Creation date : 2024-11-18
 # - Bash version : 5.2.15(1)-release
 # ------------------------------------------------------------------
 
@@ -16,6 +16,7 @@ set -euo pipefail
 ####################################################
 
 . ${WORKDIR}/shell_modules/logs.sh
+. ${WORKDIR}/shell_modules/postgresql_backup.sh
 
 ####################################################
 #                    Parameters
@@ -23,9 +24,8 @@ set -euo pipefail
 MANDATORY_VAR_LIST=$(MANDATORY_VAR_LIST:("POSTGRES_HOST" "POSTGRES_PORT" "POSTGRES_USERNAME" "POSTGRES_PASS" "RESTIC_REPOSITORY" "RESTIC_PASSWORD" "AWS_ACCESS_KEY_ID" "AWS_SECRET_ACCESS_KEY"))
 
 ### Feature activation
-FEATURE_SIZE_CHECK=${FEATURE_SIZE_CHECK:-false}
-FEATURE_BACKUP_ROTATION=${FEATURE_BACKUP_ROTATION:-false}
-FEATURE_RESTIC=${FEATURE_RESTIC:-true}
+FEATURE_SIZE_CHECK=${FEATURE_SIZE_CHECK:-true}
+FEATURE_BACKUP_ROTATION=${FEATURE_BACKUP_ROTATION:-true}
 
 ### utils parameters
 WORKDIR=${WORKDIR:-/root}
@@ -82,7 +82,6 @@ RESTICPROFILE_PASSWORD_LENGTH=${RESTICPROFILE_PASSWORD_LENGTH:-2048}
 RESTICPROFILE_PASSWORD_FILENAME=${RESTICPROFILE_PASSWORD_FILENAME:-password.key}
 PROMETHEUS_URL=${PROMETHEUS_URL}
 
-
 checkMandatoryVariable() {
 ### valid that all variables tagged as mandatory are defined ###
     log "checking mandatory variables existence"
@@ -94,7 +93,6 @@ checkMandatoryVariable() {
     done
 }
 
-
 ####################################################
 #              Main function
 ####################################################
@@ -105,3 +103,25 @@ if [ $? -ne 0 ]; then
 else
     log "all mandatory variables are set, continuing"
 fi
+
+validate_log_path || error_exit "$?"
+
+log " ==> new postgresql backup process started <=="
+create_backup_path || error_exit "$?"
+set_pg_credential || error_exit "$?"
+
+if ${FEATURE_SIZE_CHECK} ; then
+    check_database_estimated_size || exit 1
+    check_disk_space_availiability || error_exit "$?"
+fi
+
+resticprofile_configuration || error_exit "$?"
+postgresql_backup_restic || error_exit "$?"
+
+if ${PG_DUMP_SUCCESS} ; then
+    postgresql_check_readiness || error_exit "$?"
+fi
+
+ELAPSED_TIME=$(( $(date +%s)-${START_TIME} ))
+log "postgresql backup process finished in $(($ELAPSED_TIME/60)) min $(($ELAPSED_TIME%60)) sec"
+log " ==> postgresql backup process ended <=="
