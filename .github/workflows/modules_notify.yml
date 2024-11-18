@@ -32,7 +32,7 @@ jobs:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_BACKUP }}
         uses: Ilshidur/action-discord@master
         with:
-          args: 'The project {{ EVENT_PAYLOAD.repository.full_name }} has fail at step {{ EVENT_PAYLOAD.job.name }}. see more at : https://github.com/{{EVENT_PAYLOAD.GITHUB_REPOSITORY}}/actions/runs/{{EVENT_PAYLOAD.GITHUB_RUN_ID}}'
+          args: 'The project ${{ github.event.repository.name }} has fail at step ${{ github.job.name }}. see more at : https://github.com/${{github.repository}}/actions/runs/${{ github.run_id }}'
 
 
   shellcheck:
@@ -57,7 +57,7 @@ jobs:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_BACKUP }}
         uses: Ilshidur/action-discord@master
         with:
-          args: 'The project {{ EVENT_PAYLOAD.repository.full_name }} has fail at step {{ EVENT_PAYLOAD.job.name }}. see more at : https://github.com/{{EVENT_PAYLOAD.GITHUB_REPOSITORY}}/actions/runs/{{EVENT_PAYLOAD.GITHUB_RUN_ID}}'
+          args: 'The project ${{ github.event.repository.name }} has fail at step ${{ github.job.name }}. see more at : https://github.com/${{github.repository}}/actions/runs/${{ github.run_id }}'
 
 
   build:
@@ -127,7 +127,7 @@ jobs:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_BACKUP }}
         uses: Ilshidur/action-discord@master
         with:
-          args: 'The project {{ EVENT_PAYLOAD.repository.full_name }} has fail at step {{ EVENT_PAYLOAD.job.name }}. see more at : https://github.com/{{EVENT_PAYLOAD.GITHUB_REPOSITORY}}/actions/runs/{{EVENT_PAYLOAD.GITHUB_RUN_ID}}'
+          args: 'The project ${{ github.event.repository.name }} has fail at step ${{ github.job.name }}. see more at : https://github.com/${{github.repository}}/actions/runs/${{ github.run_id }}'
 
 
   notify:
@@ -144,4 +144,4 @@ jobs:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_BACKUP }}
         uses: Ilshidur/action-discord@master
         with:
-          args: 'The project {{ EVENT_PAYLOAD.repository.full_name }} successfully finished. see more at : https://github.com/{{EVENT_PAYLOAD.GITHUB_REPOSITORY}}/actions/runs/{{EVENT_PAYLOAD.GITHUB_RUN_ID}}'
+          args: 'The project ${{ github.event.repository.name }} successfully finished. see more at : https://github.com/${{github.repository}}/actions/runs/${{ github.run_id }}'
