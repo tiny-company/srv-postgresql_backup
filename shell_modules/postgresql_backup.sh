@@ -115,8 +115,6 @@ resticprofile_configuration() {
     chmod 0600 ${RESTICPROFILE_CONFIG_PATH}/${RESTICPROFILE_PASSWORD_FILENAME}
 }
 
-
-
 postgresql_backup_restic() {
 ### launching postgresql database backup and manage it with restic ###
     PG_DUMP_START_TIME=$(date +%s)

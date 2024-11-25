@@ -15,7 +15,10 @@ set -euo pipefail
 #                    Parameters
 ####################################################
 
-MANDATORY_VAR_LIST=$("CRON_SCHEDULE" "CRON_JOB")
+MANDATORY_VAR_LIST=("CRON_SCHEDULE" "CRON_JOB")
+
+### utils parameters
+WORKDIR=${WORKDIR:-/srv}
 
 ### logs parameters
 LOG_STD_OUTPUT=${LOG_STD_OUTPUT:-false}
