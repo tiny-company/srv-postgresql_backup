@@ -4,22 +4,28 @@
 
 A dokerized shell script that backup up a postgresql database based on cron, restic, pg_dump.
 
-features :
+🐳 Image is build anb pushed to dockerhub at [postgresql_backup](https://hub.docker.com/repository/docker/tinycompany/postgresql_backup/general)
+
+⚡ features :
 - disk space size check
 - store backup locally and apply rotation
 - send backup to distant s3 storage (using restic)
-- 
 
 @TODO :
 - gh action
 - yamlint
 - shellcheck
 
+💖 Credits to :
+- [monlor](https://github.com/monlor/docker-cron) : for cron docker image.
+
 ## Usage
 
 1. First set the env var (i.e : with "env" or "env_file" arg for docker-compose) :
 
 - mandatory variables :
+    - `CRON_JOB_<name> : Define cron jobs. Format: `"<schedule> <command>"`, example : `"* * * * * echo 'Hello, World!'"`
+    - `POSTGRES_DB_LIST` : list of database name to backup
     - `POSTGRES_HOST` : postgresql hostname or ip address
     - `POSTGRES_PORT` : postgresql database port
     - `POSTGRES_USERNAME` : postgresql user
@@ -56,7 +62,7 @@ features :
     - `RESTICPROFILE_PASSWORD_FILENAME`: (default :password.key) file that store restic repository's password
     - `PROMETHEUS_URL` : prometheus address to send metrics (9091)
 
-[look at a very simple .env file example here](./.env-example)
+[look at a very simple .env file example here](./.example.env)
 
 2. Then launch container using docker compose, check [docker-compose example file](./docker-compose.yml).
 
@@ -65,6 +71,10 @@ docker compose up -d
 ```
 
 ## Sources :
+
+### cron
+
+- [docker image for cron usage by monlor](https://github.com/monlor/docker-cron)
 
 ### Postgresql backup
 

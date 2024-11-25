@@ -21,7 +21,7 @@ set -euo pipefail
 ####################################################
 #                    Parameters
 ####################################################
-MANDATORY_VAR_LIST=$("POSTGRES_HOST" "POSTGRES_PORT" "POSTGRES_USERNAME" "POSTGRES_PASS" "RESTIC_REPOSITORY" "RESTIC_PASSWORD" "AWS_ACCESS_KEY_ID" "AWS_SECRET_ACCESS_KEY")
+MANDATORY_VAR_LIST=$("POSTGRES_DB_LIST" "POSTGRES_HOST" "POSTGRES_PORT" "POSTGRES_USERNAME" "POSTGRES_PASS" "RESTIC_REPOSITORY" "RESTIC_PASSWORD" "AWS_ACCESS_KEY_ID" "AWS_SECRET_ACCESS_KEY")
 
 ### Feature activation
 FEATURE_SIZE_CHECK=${FEATURE_SIZE_CHECK:-true}
@@ -100,8 +100,6 @@ checkMandatoryVariable() {
 checkMandatoryVariable
 if [ $? -ne 0 ]; then
     error_exit "mandatory variables above not set, see previous logs to see which, exiting"
-else
-    log "all mandatory variables are set, continuing"
 fi
 
 validate_log_path || error_exit "$?"
