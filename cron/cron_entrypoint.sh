@@ -77,23 +77,4 @@ fi
 
 createCronJob "${CRON_SCHEDULE}" "${CRON_JOB}" backup_job
 
-## Create logrotate configuration file
-cat << EOF > /etc/logrotate.d/cron_logs
-/var/log/cron.log {
-    size 10M
-    rotate 5
-    missingok
-    notifempty
-    compress
-    delaycompress
-    create 0644 root root
-    postrotate
-        /usr/bin/killall -HUP cron
-    endscript
-}
-EOF
-
-createCronJob "0 12 * * 1" "/usr/sbin/logrotate /etc/logrotate.d/cron_logs >> /var/log/cron.log 2>&1" logrotate_job
-
-## Start cron and keep it running in the foreground, while outputting logs
-cron -f && tail -f /var/log/cron.log
+cron -f
