@@ -96,4 +96,4 @@ EOF
 createCronJob "0 12 * * 1" "/usr/sbin/logrotate /etc/logrotate.d/cron_logs >> /var/log/cron.log 2>&1" logrotate_job
 
 ## Start cron and keep it running in the foreground, while outputting logs
-cron && tail -f /var/log/cron.log
+cron -f && tail -f /var/log/cron.log
