@@ -73,7 +73,7 @@ cat << EOF > /etc/logrotate.d/cron_logs
     delaycompress
     create 0644 root root
     postrotate
-        /usr/bin/killall -HUP crond
+        /usr/bin/killall -HUP cron
     endscript
 }
 EOF
@@ -81,8 +81,8 @@ EOF
 # Add logrotate scheduled task to crontab
 echo "0 * * * * /usr/sbin/logrotate /etc/logrotate.d/cron_logs" >> /etc/crontabs/root
 
-# Start crond and keep it running in the foreground, while outputting logs
-crond
+# Start cron and keep it running in the foreground, while outputting logs
+cron
 
 # Continuously output all log files
 exec tail -f /var/log/cron.log
