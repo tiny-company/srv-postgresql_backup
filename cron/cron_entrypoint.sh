@@ -96,7 +96,4 @@ EOF
 createCronJob "0 * * * *" "/usr/sbin/logrotate /etc/logrotate.d/cron_logs" logrotate_job
 
 ## Start cron and keep it running in the foreground, while outputting logs
-cron
-
-## Continuously output all log files
-exec tail -f /var/log/cron.log
+cron && tail -f /var/log/cron.log
