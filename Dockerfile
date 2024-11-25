@@ -6,7 +6,7 @@ USER root
 
 ENV WORKDIR=/srv
 RUN mkdir -p ${WORKDIR} \
-    && mkdir -p /etc/crontabs/
+    && mkdir -p /etc/cron.d
 
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y --no-install-recommends \

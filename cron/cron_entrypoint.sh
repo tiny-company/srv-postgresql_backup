@@ -56,7 +56,7 @@ if [ $? -ne 0 ]; then
     error_exit "mandatory variables above not set, see previous logs to see which, exiting"
 fi
 
-echo "${CRON_SCHEDULE} ${CRON_JOB}  &> /var/log/cron.log" >> /etc/crontabs/root
+echo "${CRON_SCHEDULE} ${CRON_JOB}  &> /var/log/cron.log" >> /etc/cron.d/backup_job
 
 ## Create logrotate configuration file
 cat << EOF > /etc/logrotate.d/cron_logs
@@ -75,7 +75,7 @@ cat << EOF > /etc/logrotate.d/cron_logs
 EOF
 
 ## Add logrotate scheduled task to crontab
-echo "0 * * * * /usr/sbin/logrotate /etc/logrotate.d/cron_logs" >> /etc/crontabs/root
+echo "0 * * * * /usr/sbin/logrotate /etc/logrotate.d/cron_logs" >> /etc/cron.d/logrotate_job
 
 ## Start cron and keep it running in the foreground, while outputting logs
 cron
