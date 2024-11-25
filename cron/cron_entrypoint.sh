@@ -77,4 +77,4 @@ fi
 
 createCronJob "${CRON_SCHEDULE}" "${CRON_JOB}" backup_job
 
-cron -f
+cron && tail -f /var/log/cron.log

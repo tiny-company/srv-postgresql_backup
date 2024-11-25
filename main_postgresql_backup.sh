@@ -46,9 +46,9 @@ BACKUP_COMPRESSION_LEVEL=${BACKUP_COMPRESSION_LEVEL:-5}
 BACKUP_DAILY_COUNT=${BACKUP_DAILY_COUNT:-6}
 
 ### logs parameters
-LOG_STD_OUTPUT=${LOG_STD_OUTPUT:-true}
-LOG_DIR=${LOG_DIR:-/var/log/tinycompany/postgresql_backup}
-SCRIPT_NAME="${SCRIPT_NAME:-postgresql_backup_script}.log"
+LOG_STD_OUTPUT=${LOG_STD_OUTPUT:-false}
+LOG_DIR=${LOG_DIR:-/var/log}
+SCRIPT_NAME="${SCRIPT_NAME:-cron}.log"
 LOG_FILE=${LOG_DIR}/${SCRIPT_NAME}
 
 ### pg_ready parameters
