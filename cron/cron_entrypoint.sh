@@ -59,6 +59,8 @@ createCronJob() {
     TEMP_CRON_SCHEDULE=$(echo "$1" | tr -d '"')
     TEMP_CRON_JOB=$(echo "$2" | tr -d '"')
     ## adding env var
+    mkdir -p ${CRON_BASE_DIR}
+    touch ${CRON_BASE_DIR}/$3
     cat ${CRON_BASE_DIR}/$3 << EOF
 POSTGRES_USERNAME=${POSTGRES_USERNAME}
 LOG_DIR=${LOG_DIR}
