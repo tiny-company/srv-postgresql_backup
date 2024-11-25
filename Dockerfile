@@ -5,7 +5,8 @@ LABEL org.opencontainers.image.authors="ottomatic"
 USER root
 
 ENV WORKDIR=/root
-RUN mkdir -p ${WORKDIR}
+RUN mkdir -p ${WORKDIR} \
+    && mkdir -p /etc/crontabs/
 
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y --no-install-recommends \
