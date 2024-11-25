@@ -27,7 +27,7 @@ COPY --chmod=744 cron/cron_entrypoint.sh /cron_entrypoint.sh
 RUN touch /var/log/cron.log
 
 # Use tini as the entry point
-ENTRYPOINT ["/sbin/tini", "--"]
+ENTRYPOINT ["/bin/tini", "--"]
 
 # Set the default command to run our entrypoint script
 CMD ["/entrypoint.sh"]
