@@ -58,7 +58,7 @@ createCronJob() {
 ###
     TEMP_CRON_SCHEDULE=$(echo "$1" | tr -d '"')
     TEMP_CRON_JOB=$(echo "$2" | tr -d '"')
-    CRON_CREATION_OC=$(echo "${TEMP_CRON_SCHEDULE} ${TEMP_CRON_JOB} >> /var/log/cron.log 2>&1" >> ${CRON_BASE_DIR}/$3)
+    CRON_CREATION_OC=$(echo "${TEMP_CRON_SCHEDULE} ${TEMP_CRON_JOB}" >> ${CRON_BASE_DIR}/$3)
     if [ $? -ne 0 ]; then
         error_exit "error while creating job $3 : ${CRON_CREATION_OC}"
     else
@@ -93,7 +93,7 @@ cat << EOF > /etc/logrotate.d/cron_logs
 }
 EOF
 
-createCronJob "0 12 * * 1" "/usr/sbin/logrotate /etc/logrotate.d/cron_logs" logrotate_job
+createCronJob "0 12 * * 1" "/usr/sbin/logrotate /etc/logrotate.d/cron_logs >> /var/log/cron.log 2>&1" logrotate_job
 
 ## Start cron and keep it running in the foreground, while outputting logs
 cron && tail -f /var/log/cron.log
