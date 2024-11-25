@@ -27,7 +27,7 @@ SCRIPT_NAME="${SCRIPT_NAME:-cron}.log"
 LOG_FILE=${LOG_DIR}/${SCRIPT_NAME}
 
 ## cron parameters
-CRON_BASE_DIR=${CRON_BASE_DIR:-/etc/cron.d/}
+CRON_BASE_DIR=${CRON_BASE_DIR:-/etc/cron.d}
 
 
 ####################################################
