@@ -3,66 +3,69 @@
 # ------------------------------------------------------------------
 # - Filename: cron_entrypoint.sh
 # - Author : ottomatic
-# - Dependency :
+# - Dependency : logs.sh
 # - Description : container cron entrypoint
 # - Creation date : 2024-11-25
 # - Bash version : 5.2.15(1)-release
 # ------------------------------------------------------------------
 
-set -u
+set -euo pipefail
 
-# Create log directory
-[ ! -f /var/log/cron.log ] && touch /var/log/cron.log
+####################################################
+#                    Parameters
+####################################################
 
-# Create crontab file
-cat /dev/null > /etc/crontabs/root
+MANDATORY_VAR_LIST=$("CRON_SCHEDULE" "CRON_JOB")
 
-# Syntax check function
-check_syntax() {
-    if ! bash -n <<< "$1"; then
-        echo "> Syntax error in command: $1" >&2
-        return 1
-    fi
-    return 0
+### logs parameters
+LOG_STD_OUTPUT=${LOG_STD_OUTPUT:-false}
+LOG_DIR=${LOG_DIR:-/var/log}
+SCRIPT_NAME="${SCRIPT_NAME:-cron}.log"
+LOG_FILE=${LOG_DIR}/${SCRIPT_NAME}
+
+####################################################
+#                    Dependencies
+####################################################
+
+. ${WORKDIR}/shell_modules/logs.sh
+
+####################################################
+#                    Utils function
+####################################################
+
+checkMandatoryVariable() {
+### valid that all variables tagged as mandatory are defined ###
+    log "checking mandatory variables existence"
+    for var in "${MANDATORY_VAR_LIST[@]}"; do
+        if [[ -z "${var+x}" ]]; then
+            error "$var is not defined or is empty."
+            return 1
+        fi
+    done
 }
 
-# Add startup condition check
-if [ ! -z "${STARTUP_CONDITION:-}" ]; then
-    echo "> Waiting for startup condition to be met..."
-    while ! eval "$STARTUP_CONDITION"; do
-        echo "> Failed to meet startup condition. Retrying..."
-        sleep 1
-    done
-    echo "> Startup condition met. Proceeding with service startup."
+create_cron_job() {
+### create crob job from env var args ###
+    if check_syntax "$job_command"; then
+        echo "${CRON_SCHEDULE} ${CRON_JOB}  &> /var/log/cron.log" >> /etc/crontabs/root
+        log "Succesffuly added cron job."
+    else
+        error_exit "Failed to add cron job." >&2
+    fi
+}
+
+####################################################
+#              Main function
+####################################################
+
+checkMandatoryVariable
+if [ $? -ne 0 ]; then
+    error_exit "mandatory variables above not set, see previous logs to see which, exiting"
 fi
 
-# Configure scheduled tasks
-env | grep ^CRON_JOB_ | sort | while read -r var; do
-    job_name="$(echo $var | cut -d= -f1 | cut -d_ -f3- | tr '[:upper:]' '[:lower:]')"
-    job_schedule="$(echo $var | cut -d= -f2- | cut -d' ' -f1-5)"
-    job_command="$(echo $var | cut -d= -f2- | cut -d' ' -f6-)"
-    if check_syntax "$job_command"; then
-        echo "${job_schedule} ${job_command} 2>&1 | sed -e \"s/^/[$job_name]: /g\" &> /var/log/cron.log" >> /etc/crontabs/root
-        echo "> Added cron job: $job_name"
-    else
-        echo "> Failed to add cron job due to syntax error: $job_name" >&2
-    fi
-done
+create_cron_job
 
-# Configure startup tasks
-env | grep ^STARTUP_COMMAND_ | sort | while read -r var; do
-    task_name="$(echo $var | cut -d= -f1 | cut -d_ -f3- | tr '[:upper:]' '[:lower:]')"
-    task_command="$(echo $var | cut -d= -f2-)"
-
-    if check_syntax "$task_command"; then
-        echo "> Executing startup task: $task_name"
-        eval "$task_command" 2>&1 | sed -e "s/^/[$task_name]: /g"
-    else
-        echo "> Failed to execute startup task due to syntax error: $task_name" >&2
-    fi
-done
-
-# Create logrotate configuration file
+## Create logrotate configuration file
 cat << EOF > /etc/logrotate.d/cron_logs
 /var/log/cron.log {
     size 10M
@@ -78,11 +81,11 @@ cat << EOF > /etc/logrotate.d/cron_logs
 }
 EOF
 
-# Add logrotate scheduled task to crontab
+## Add logrotate scheduled task to crontab
 echo "0 * * * * /usr/sbin/logrotate /etc/logrotate.d/cron_logs" >> /etc/crontabs/root
 
-# Start cron and keep it running in the foreground, while outputting logs
+## Start cron and keep it running in the foreground, while outputting logs
 cron
 
-# Continuously output all log files
+## Continuously output all log files
 exec tail -f /var/log/cron.log

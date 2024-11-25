@@ -12,13 +12,6 @@
 set -euo pipefail
 
 ####################################################
-#                    Dependencies
-####################################################
-
-. ${WORKDIR}/shell_modules/logs.sh
-. ${WORKDIR}/shell_modules/postgresql_backup.sh
-
-####################################################
 #                    Parameters
 ####################################################
 MANDATORY_VAR_LIST=$("POSTGRES_DB_LIST" "POSTGRES_HOST" "POSTGRES_PORT" "POSTGRES_USERNAME" "POSTGRES_PASS" "RESTIC_REPOSITORY" "RESTIC_PASSWORD" "AWS_ACCESS_KEY_ID" "AWS_SECRET_ACCESS_KEY")
@@ -28,14 +21,14 @@ FEATURE_SIZE_CHECK=${FEATURE_SIZE_CHECK:-true}
 FEATURE_BACKUP_ROTATION=${FEATURE_BACKUP_ROTATION:-true}
 
 ### utils parameters
-WORKDIR=${WORKDIR:-/root}
+WORKDIR=${WORKDIR:-/srv}
 START_TIME=$(date +%s)
 DATE=$(date '+%Y-%m-%d')
 USERNAME=$(id -un)
 
 ### backup path
 BACKUP_NAME=${BACKUP_NAME:-postgresql}
-BACKUP_BASE_DIR=${BACKUP_BASE_DIR:-/backup/webdrone}
+BACKUP_BASE_DIR=${BACKUP_BASE_DIR:-/backup/tinycompany}
 BACKUP_POSTGRES_DIR=${BACKUP_BASE_DIR}/${BACKUP_NAME}
 BACKUP_POSTGRES_DIR_MOUNT_POINT=${BACKUP_POSTGRES_DIR_MOUNT_POINT:-/backup}
 
@@ -52,12 +45,9 @@ BACKUP_PARALELL_THREAD=${BACKUP_PARALELL_THREAD:-1}
 BACKUP_COMPRESSION_LEVEL=${BACKUP_COMPRESSION_LEVEL:-5}
 BACKUP_DAILY_COUNT=${BACKUP_DAILY_COUNT:-6}
 
-### encryption parameters
-DB_DUMP_ENCRYPTION=${DB_DUMP_ENCRYPTION:-1}
-
 ### logs parameters
 LOG_STD_OUTPUT=${LOG_STD_OUTPUT:-true}
-LOG_DIR=${LOG_DIR:-/var/log/webdrone/postgresql_backup}
+LOG_DIR=${LOG_DIR:-/var/log/tinycompany/postgresql_backup}
 SCRIPT_NAME="${SCRIPT_NAME:-postgresql_backup_script}.log"
 LOG_FILE=${LOG_DIR}/${SCRIPT_NAME}
 
@@ -81,6 +71,17 @@ RESTICPROFILE_CONFIG_PATH=${RESTICPROFILE_CONFIG_PATH:-/root/resticprofile}
 RESTICPROFILE_PASSWORD_LENGTH=${RESTICPROFILE_PASSWORD_LENGTH:-2048}
 RESTICPROFILE_PASSWORD_FILENAME=${RESTICPROFILE_PASSWORD_FILENAME:-password.key}
 PROMETHEUS_URL=${PROMETHEUS_URL}
+
+####################################################
+#                    Dependencies
+####################################################
+
+. ${WORKDIR}/shell_modules/logs.sh
+. ${WORKDIR}/shell_modules/postgresql_backup.sh
+
+####################################################
+#                    Utils function
+####################################################
 
 checkMandatoryVariable() {
 ### valid that all variables tagged as mandatory are defined ###
