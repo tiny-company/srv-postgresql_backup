@@ -15,7 +15,7 @@ set -u
 [ ! -f /var/log/cron.log ] && touch /var/log/cron.log
 
 # Create crontab file
-cat /dev/null > /etc/crontabs/root
+cat /dev/null > /etc/crontab/root
 
 # Syntax check function
 check_syntax() {
@@ -42,7 +42,7 @@ env | grep ^CRON_JOB_ | sort | while read -r var; do
     job_schedule="$(echo $var | cut -d= -f2- | cut -d' ' -f1-5)"
     job_command="$(echo $var | cut -d= -f2- | cut -d' ' -f6-)"
     if check_syntax "$job_command"; then
-        echo "${job_schedule} ${job_command} 2>&1 | sed -e \"s/^/[$job_name]: /g\" &> /var/log/cron.log" >> /etc/crontabs/root
+        echo "${job_schedule} ${job_command} 2>&1 | sed -e \"s/^/[$job_name]: /g\" &> /var/log/cron.log" >> /etc/crontab/root
         echo "> Added cron job: $job_name"
     else
         echo "> Failed to add cron job due to syntax error: $job_name" >&2
@@ -79,7 +79,7 @@ cat << EOF > /etc/logrotate.d/cron_logs
 EOF
 
 # Add logrotate scheduled task to crontab
-echo "0 * * * * /usr/sbin/logrotate /etc/logrotate.d/cron_logs" >> /etc/crontabs/root
+echo "0 * * * * /usr/sbin/logrotate /etc/logrotate.d/cron_logs" >> /etc/crontab/root
 
 # Start crond and keep it running in the foreground, while outputting logs
 crond
