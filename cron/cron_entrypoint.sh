@@ -47,16 +47,6 @@ checkMandatoryVariable() {
     done
 }
 
-create_cron_job() {
-### create crob job from env var args ###
-    if check_syntax "$job_command"; then
-        echo "${CRON_SCHEDULE} ${CRON_JOB}  &> /var/log/cron.log" >> /etc/crontabs/root
-        log "Succesffuly added cron job."
-    else
-        error_exit "Failed to add cron job." >&2
-    fi
-}
-
 ####################################################
 #              Main function
 ####################################################
@@ -66,7 +56,7 @@ if [ $? -ne 0 ]; then
     error_exit "mandatory variables above not set, see previous logs to see which, exiting"
 fi
 
-create_cron_job
+echo "${CRON_SCHEDULE} ${CRON_JOB}  &> /var/log/cron.log" >> /etc/crontabs/root
 
 ## Create logrotate configuration file
 cat << EOF > /etc/logrotate.d/cron_logs

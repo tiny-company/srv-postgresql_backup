@@ -12,9 +12,7 @@ A dokerized shell script that backup up a postgresql database based on cron, res
 - send backup to distant s3 storage (using restic)
 
 @TODO :
-- gh action
-- yamlint
-- shellcheck
+- hadolint
 
 💖 Credits to :
 - [monlor](https://github.com/monlor/docker-cron) : for cron docker image.
