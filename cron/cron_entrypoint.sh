@@ -56,8 +56,8 @@ createCronJob() {
 ###    arg 2 : cron job action
 ###    arg 3 : cron job name
 ###
-    $TEMP_CRON_SCHEDULE=$(echo "$1" | tr -d '"')
-    $TEMP_CRON_JOB=$(echo "$2" | tr -d '"')
+    TEMP_CRON_SCHEDULE=$(echo "$1" | tr -d '"')
+    TEMP_CRON_JOB=$(echo "$2" | tr -d '"')
     CRON_CREATION_OC=$(echo "${TEMP_CRON_SCHEDULE} ${TEMP_CRON_JOB}  &> /var/log/cron.log" >> ${CRON_BASE_DIR}/$3)
     if [ $? -ne 0 ]; then
         error_exit "error while creating job $3 : ${CRON_CREATION_OC}"
