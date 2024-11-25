@@ -30,4 +30,4 @@ RUN touch /var/log/cron.log
 ENTRYPOINT ["/bin/tini", "--"]
 
 # Set the default command to run our entrypoint script
-CMD ["/entrypoint.sh"]
+CMD ["/cron_entrypoint.sh"]
