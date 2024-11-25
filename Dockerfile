@@ -20,8 +20,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --chmod=644 resticprofile ${WORKDIR}/resticprofile
-COPY --chmod=644 shell_modules ${WORKDIR}/shell_modules
-COPY --chmod=644 main_postgresql_backup.sh ${WORKDIR}/main_postgresql_backup.sh
+COPY --chmod=744 shell_modules ${WORKDIR}/shell_modules
+COPY --chmod=744 main_postgresql_backup.sh ${WORKDIR}/main_postgresql_backup.sh
 COPY --chmod=744 cron/cron_entrypoint.sh /cron_entrypoint.sh
 
 RUN touch /var/log/cron.log
