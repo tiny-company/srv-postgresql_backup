@@ -7,15 +7,16 @@ USER root
 ENV WORKDIR=/root
 RUN mkdir -p ${WORKDIR}
 
-RUN apt-get install -y --no-install-recommends \
-        tini \
-        logrotate \
-        dcron \
-        postgresql-client \
-        restic \
-        curl \
-        cron \
-        rclone \
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    tini \
+    logrotate \
+    dcron \
+    postgresql-client \
+    restic \
+    curl \
+    cron \
+    rclone \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --chmod=644 resticprofile srv/resticprofile
