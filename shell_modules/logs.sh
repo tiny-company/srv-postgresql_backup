@@ -30,8 +30,6 @@ validate_log_path() {
         mkdir -p ${LOG_DIR}
         ( [ -e "${LOG_FILE}" ] || touch "${LOG_FILE}" ) && [ ! -w "${LOG_FILE}" ] && error_exit "cannot write to ${LOG_FILE}"
         chown $(id -un) ${LOG_FILE}
-    else
-        ln -sf /dev/stdout ${LOG_FILE}
     fi
 }
 
