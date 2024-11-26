@@ -85,7 +85,6 @@ PROMETHEUS_URL=${PROMETHEUS_URL:-}
 
 checkMandatoryVariable() {
 ### valid that all variables tagged as mandatory are defined ###
-    log "checking mandatory variables existence"
     for var in "${MANDATORY_VAR_LIST[@]}"; do
         if [[ -z "${var+x}" ]]; then
             error "$var is not defined or is empty."

@@ -10,6 +10,7 @@ RUN mkdir -p ${WORKDIR} \
 
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates \
     postgresql-client \
     restic \
     curl \
