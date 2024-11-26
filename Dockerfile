@@ -10,20 +10,17 @@ RUN mkdir -p ${WORKDIR} \
 
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    logrotate \
     postgresql-client \
     restic \
     curl \
-    cron \
     rclone \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --chmod=644 resticprofile ${WORKDIR}/resticprofile
 COPY --chmod=744 shell_modules ${WORKDIR}/shell_modules
 COPY --chmod=744 main_postgresql_backup.sh ${WORKDIR}/main_postgresql_backup.sh
-COPY --chmod=744 cron/cron_entrypoint.sh /cron_entrypoint.sh
+COPY --chmod=744 entrypoint/entrypoint.sh /entrypoint.sh
 
 RUN touch /var/log/cron.log
 
-# Set the default command to run our entrypoint script
-CMD ["/cron_entrypoint.sh"]
+CMD ["/entrypoint.sh"]
