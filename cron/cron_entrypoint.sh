@@ -58,26 +58,32 @@ createCronJob() {
 ###
     TEMP_CRON_SCHEDULE=$(echo "$1" | tr -d '"')
     TEMP_CRON_JOB=$(echo "$2" | tr -d '"')
-    ## adding env var
     mkdir -p ${CRON_BASE_DIR}
     touch ${CRON_BASE_DIR}/$3
-    cat ${CRON_BASE_DIR}/$3 << EOF
-POSTGRES_USERNAME=${POSTGRES_USERNAME}
-LOG_DIR=${LOG_DIR}
-RESTIC_REPOSITORY=${RESTIC_REPOSITORY}
-CRON_JOB=${CRON_JOB}
-POSTGRES_DB_LIST=${POSTGRES_DB_LIST}
-POSTGRES_PASS=${POSTGRES_PASS}
-POSTGRES_HOST=${POSTGRES_HOST}
-LOG_STD_OUTPUT=${LOG_STD_OUTPUT}
-WORKDIR=${WORKDIR}
-AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
-AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
-POSTGRES_PORT=${POSTGRES_PORT}
-CRON_SCHEDULE=${CRON_SCHEDULE}
-RESTIC_PASSWORD=${RESTIC_PASSWORD}
-SCRIPT_NAME=${SCRIPT_NAME}
-EOF
+    ## adding env var
+    ENV_VAR_LIST=(
+        "POSTGRES_USERNAME=${POSTGRES_USERNAME:-}"
+        "LOG_DIR=${LOG_DIR:-}"
+        "RESTIC_REPOSITORY=${RESTIC_REPOSITORY:-}"
+        "CRON_JOB=${CRON_JOB:-}"
+        "POSTGRES_DB_LIST=${POSTGRES_DB_LIST:-}"
+        "POSTGRES_PASS=${POSTGRES_PASS:-}"
+        "POSTGRES_HOST=${POSTGRES_HOST:-}"
+        "LOG_STD_OUTPUT=${LOG_STD_OUTPUT:-}"
+        "WORKDIR=${WORKDIR:-}"
+        "AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID:-}"
+        "AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY:-}"
+        "POSTGRES_PORT=${POSTGRES_PORT:-}"
+        "CRON_SCHEDULE=${CRON_SCHEDULE:-}"
+        "RESTIC_PASSWORD=${RESTIC_PASSWORD:-}"
+        "SCRIPT_NAME=${SCRIPT_NAME:-}"
+    )
+    for var in "${ENV_VAR_LIST[@]}"; do
+        if [[ -z "${var+x}" ]]; then
+            echo "$var" >> ${CRON_BASE_DIR}/$3
+        fi
+    done
+
     ## adding cron job
     CRON_CREATION_OC=$(echo "${TEMP_CRON_SCHEDULE} root ${TEMP_CRON_JOB}" >> ${CRON_BASE_DIR}/$3)
     if [ $? -ne 0 ]; then
@@ -98,4 +104,4 @@ fi
 
 createCronJob "${CRON_SCHEDULE}" "${CRON_JOB}" backup_job
 
-cron && tail -f /var/log/cron.log
+crontab ${CRON_BASE_DIR}/backup_job && tail -f /var/log/cron.log
