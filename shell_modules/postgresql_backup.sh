@@ -64,6 +64,8 @@ check_database_estimated_size() {
 }
 
 check_disk_space_availiability(){
+    ## make sure that backup dir path mount is created
+    mkdir -p ${BACKUP_POSTGRES_DIR_MOUNT_POINT}
     log "checking disk space availability"
     # check if BACKUP_POSTGRES_DIR_MOUNT_POINT exist
     SPACE_AVAILABLE=$(df -h | grep -i ${BACKUP_POSTGRES_DIR_MOUNT_POINT} | awk '{print $4}')
@@ -110,6 +112,7 @@ resticprofile_configuration() {
         log "restic password not set by user, generate random key"
         resticprofile generate --random-key ${RESTICPROFILE_PASSWORD_LENGTH} > ${RESTICPROFILE_CONFIG_PATH}/${RESTICPROFILE_PASSWORD_FILENAME}
     else
+        log "setting user defined restic password to file ${RESTICPROFILE_CONFIG_PATH}/${RESTICPROFILE_PASSWORD_FILENAME}"
         echo ${RESTIC_PASSWORD} > ${RESTICPROFILE_CONFIG_PATH}/${RESTICPROFILE_PASSWORD_FILENAME}
     fi
     chmod 0600 ${RESTICPROFILE_CONFIG_PATH}/${RESTICPROFILE_PASSWORD_FILENAME}
