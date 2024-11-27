@@ -115,7 +115,14 @@ resticprofile_configuration() {
         log "setting user defined restic password to file ${RESTICPROFILE_CONFIG_PATH}/${RESTICPROFILE_PASSWORD_FILENAME}"
         ## debug try to create pass file before updating content
         touch ${RESTICPROFILE_CONFIG_PATH}/${RESTICPROFILE_PASSWORD_FILENAME}
-        echo ${RESTIC_PASSWORD} > ${RESTICPROFILE_CONFIG_PATH}/${RESTICPROFILE_PASSWORD_FILENAME}
+        echo ${RESTIC_PASSWORD} > ${RESTICPROFILE_CONFIG_PATH}/${RESTICPROFILE_PASSWORD_FILENAME}*
+        ## more debug
+        if [ $? -eq 0 ];then
+            log "touch and echo pass in file in success"
+        else
+            warn "touch and echo pass in file failure"
+        fi
+
     fi
     chmod 0600 ${RESTICPROFILE_CONFIG_PATH}/${RESTICPROFILE_PASSWORD_FILENAME}
 }
