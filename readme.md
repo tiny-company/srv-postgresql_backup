@@ -12,6 +12,7 @@ A dokerized shell script that backup up a postgresql database based on cron, res
 - send backup to distant s3 storage (using restic)
 
 @TODO :
+- cleanup pgdump after backup
 - hadolint
 
 💖 Credits to :
@@ -28,10 +29,10 @@ A dokerized shell script that backup up a postgresql database based on cron, res
     - `POSTGRES_PORT` : postgresql database port
     - `POSTGRES_USERNAME` : postgresql user
     - `POSTGRES_PASS` : postgresql password
-    - `RESTIC_REPOSITORY` : (mandatory if using restic) restic repository
-    - `RESTIC_PASSWORD` : (mandatory if using restic) restic repository's password
-    - `AWS_ACCESS_KEY_ID` : (mandatory if using restic) S3 access key
-    - `AWS_SECRET_ACCESS_KEY` : (mandatory if using restic) S3 secret access key
+    - `RESTIC_REPOSITORY` : restic repository
+    - `RESTIC_PASSWORD` : restic repository's password
+    - `AWS_ACCESS_KEY_ID` : S3 access key
+    - `AWS_SECRET_ACCESS_KEY` : S3 secret access key
 
 - not mandatory :
     - `FEATURE_SIZE_CHECK` : (default : false) Activate disk size check feature.

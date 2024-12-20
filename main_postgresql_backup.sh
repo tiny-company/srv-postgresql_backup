@@ -113,7 +113,8 @@ if ${FEATURE_SIZE_CHECK} ; then
     check_disk_space_availiability || error_exit "$?"
 fi
 
-resticprofile_configuration || error_exit "$?"
+# resticprofile_configuration || error_exit "$?"
+restic_configuration || error_exit "$?"
 postgresql_backup_restic || error_exit "$?"
 
 if ${PG_DUMP_SUCCESS} ; then
