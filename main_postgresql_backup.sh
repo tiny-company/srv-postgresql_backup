@@ -85,6 +85,8 @@ PROMETHEUS_URL=${PROMETHEUS_URL:-}
 #              Main function
 ####################################################
 
+BACKUP_START_TIME=$(date +%s)
+
 validate_log_path || error_exit "$?"
 
 checkMandatoryVariable ${MANDATORY_VAR_LIST}
@@ -97,8 +99,8 @@ create_backup_path || error_exit "$?"
 set_pg_credential || error_exit "$?"
 
 if ${FEATURE_SIZE_CHECK} ; then
-    check_database_estimated_size || exit 1
-    check_disk_space_availiability || error_exit "$?"
+    check_database_estimated_size || backup_failure_message
+    check_disk_space_availiability || backup_failure_message
 fi
 
 # resticprofile_configuration || error_exit "$?"

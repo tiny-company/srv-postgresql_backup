@@ -18,6 +18,17 @@ create_backup_path() {
 }
 
 ####################################################
+#         backup error
+####################################################
+
+backup_failure_message() {
+### default backup failure message ###
+    ELAPSED_TIME=$(( $(date +%s)-${BACKUP_START_TIME} ))
+    error "postgresql restore process ended (in error) in $(($ELAPSED_TIME/60)) min $(($ELAPSED_TIME%60)) sec"
+    error "backup failure on ${POSTGRES_HOST}."
+}
+
+####################################################
 #              Backup function
 ####################################################
 
@@ -84,7 +95,7 @@ postgresql_backup_restic() {
 
         FILENAME=${BACKUP_POSTGRES_DIR}/${POSTGRES_HOST}.${DB}.${DATE}.dmp
 
-        PG_DUMP_RESULT=$(pg_dump -h ${POSTGRES_HOST} -U ${POSTGRES_USERNAME} -d ${DB} -j ${BACKUP_PARALELL_THREAD} -F ${BACKUP_FORMAT} --no-owner -f ${FILENAME} 2>&1)
+        PG_DUMP_RESULT=$(pg_dump -h ${POSTGRES_HOST} -U ${POSTGRES_USERNAME} -d ${DB} -j ${BACKUP_PARALELL_THREAD} -F ${BACKUP_FORMAT} --no-owner -f ${FILENAME} > /dev/null)
         PG_DUMP_ELAPSED_TIME=$(( $(date +%s)-${PG_DUMP_START_TIME} ))
         if [ $? -eq 0 ];then
             ## temp debug log
@@ -92,9 +103,6 @@ postgresql_backup_restic() {
             BACKUP_FILE_DATA=$(ls -la ${FILENAME})
             log "backup data : ${BACKUP_FILE_DATA}"
             log "dump result output : ${PG_DUMP_RESULT}"
-            log "========================="
-            TABLE_LIST=$(psql -h ${POSTGRES_HOST} -U ${POSTGRES_USERNAME} -d ${DB} -c "\dt")
-            log "${TABLE_LIST}"
             ## 
             log "postgresql dump process ended (in success) for Database : ${DB} in $(($PG_DUMP_ELAPSED_TIME/60)) min $(($PG_DUMP_ELAPSED_TIME%60)) sec"
             PG_DUMP_SUCCESS=true

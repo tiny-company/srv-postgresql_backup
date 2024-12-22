@@ -67,7 +67,7 @@ check_database_estimated_size() {
 ### Get the estimated postgresql database size using pg_database_size ###
     for DB in ${POSTGRES_DB_LIST}; do
         PG_SIZE_TMP_INITIAL=0
-        PG_SIZE_TMP=$(psql -t -h ${POSTGRES_HOST} -U ${POSTGRES_USERNAME} -d ${DB} -c "SELECT pg_database_size('${DB}');" 2>&1)
+        PG_SIZE_TMP=$(psql -t -h ${POSTGRES_HOST} -U ${POSTGRES_USERNAME} -d ${DB} -c "SELECT pg_database_size('${DB}');")
         if [ $? -eq 0 ];then
             # strip any non numeric charachter in PG_SIZE_TMP
             PG_SIZE_TMP=$(echo ${PG_SIZE_TMP} | sed 's/[^0-9]*//g')
@@ -75,10 +75,7 @@ check_database_estimated_size() {
             PG_SIZE_TMP=$((PG_SIZE_TMP/1024/1024/1024))
             PG_SIZE_TMP_INITIAL=$((PG_SIZE_TMP_INITIAL + PG_SIZE_TMP))
         else
-            error "backup failure on ${POSTGRES_HOST} for database: ${DB}"
-            ELAPSED_TIME=$(( $(date +%s)-${START_TIME} ))
-            log "postgresql backup process ended (in error) for Database : ${DB} in $(($ELAPSED_TIME/60)) min $(($ELAPSED_TIME%60)) sec while estimating database size"
-            error "${PG_SIZE_TMP}"
+            error "Error on estimating database size : ${PG_SIZE_TMP}"
             return 1
             break
         fi
