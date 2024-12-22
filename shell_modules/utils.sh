@@ -15,7 +15,8 @@
 
 checkMandatoryVariable() {
 ### valid that all variables tagged as mandatory are defined ###
-    for var in "${MANDATORY_VAR_LIST[@]}"; do
+    MANDATORY_VAR_LIST_TMP=$1
+    for var in "${MANDATORY_VAR_LIST_TMP[@]}"; do
         if [[ -z "${var+x}" ]]; then
             error "$var is not defined or is empty."
             return 1
@@ -28,13 +29,9 @@ checkMandatoryVariable() {
 ####################################################
 
 check_disk_space_availiability(){
-    ## make sure that backup dir path mount is created
-    mkdir -p ${BACKUP_POSTGRES_DIR_MOUNT_POINT}
+### check disk space available ###
     log "checking disk space availability"
-    # check if BACKUP_POSTGRES_DIR_MOUNT_POINT exist
-    SPACE_AVAILABLE=$(df -h | grep -i ${BACKUP_POSTGRES_DIR_MOUNT_POINT} | awk '{print $4}')
-    # strip any non numeric character in SPACE_AVAILABLE
-    SPACE_AVAILABLE=$(echo ${SPACE_AVAILABLE} | sed 's/[^0-9]*//g')
+    SPACE_AVAILABLE=$(df -BG ${BACKUP_POSTGRES_DIR_MOUNT_POINT} | awk 'NR==2 {print $2}' | tr -d 'G')
     if [ "${SPACE_AVAILABLE}" != "" ] ;then
         log "database size: ${PG_SIZE_TMP_INITIAL}GB and space available : ${SPACE_AVAILABLE}GB"
         if [ ${PG_SIZE_TMP_INITIAL} -gt ${SPACE_AVAILABLE} ];then

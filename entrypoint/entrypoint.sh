@@ -3,7 +3,7 @@
 # ------------------------------------------------------------------
 # - Filename: cron_entrypoint.sh
 # - Author : ottomatic
-# - Dependency : logs.sh
+# - Dependency : logs.sh, utils.sh
 # - Description : container cron entrypoint
 # - Creation date : 2024-11-25
 # - Bash version : 5.2.15(1)-release
@@ -25,6 +25,7 @@ LOG_STD_OUTPUT=${LOG_STD_OUTPUT:-false}
 LOG_DIR=${LOG_DIR:-/var/log}
 SCRIPT_NAME="${SCRIPT_NAME:-cron}.log"
 LOG_FILE=${LOG_DIR}/${SCRIPT_NAME}
+LOG_COLORED=${LOG_COLORED:-false}
 
 ## cron parameters
 SLEEP_SEC_DURATION=${SLEEP_SEC_DURATION:-86400}
@@ -35,40 +36,40 @@ SLEEP_SEC_DURATION=${SLEEP_SEC_DURATION:-86400}
 ####################################################
 
 . ${WORKDIR}/shell_modules/logs.sh
+. ${WORKDIR}/shell_modules/utils.sh
 
 ####################################################
 #                    Utils function
 ####################################################
 
-checkMandatoryVariable() {
-### valid that all variables tagged as mandatory are defined ###
-    for var in "${MANDATORY_VAR_LIST[@]}"; do
-        if [[ -z "${var+x}" ]]; then
-            error "$var is not defined or is empty."
-            return 1
-        fi
+cron_backup() {
+### planned backup by calling using backup function and wait with sleep ###
+    while true; do
+        ${WORKDIR}/main_postgresql_backup.sh
+        sleep ${SLEEP_SEC_DURATION}
     done
 }
+
 
 ####################################################
 #              Main function
 ####################################################
 
-checkMandatoryVariable
+checkMandatoryVariable ${MANDATORY_VAR_LIST}
 if [ $? -ne 0 ]; then
     error_exit "mandatory variables above not set, see previous logs to see which, exiting"
 fi
 
 if [ "$#" -eq 0 ]; then
     # No arguments passed, run the default script
-    while true; do
-        ${WORKDIR}/main_postgresql_backup.sh
-        sleep ${SLEEP_SEC_DURATION}
-    done
+    cron_backup
 else
     case "$1" in
-        backup)
+        onetime_backup)
             ${WORKDIR}/main_postgresql_backup.sh
+            ;;
+        cron_backup)
+            cron_backup
             ;;
         restore)
             if [ $# -ge 2 ]; then

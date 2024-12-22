@@ -87,7 +87,7 @@ PROMETHEUS_URL=${PROMETHEUS_URL:-}
 
 validate_log_path || error_exit "$?"
 
-checkMandatoryVariable
+checkMandatoryVariable ${MANDATORY_VAR_LIST}
 if [ $? -ne 0 ]; then
     error_exit "mandatory variables above not set, see previous logs to see which, exiting"
 fi

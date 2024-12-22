@@ -26,4 +26,4 @@ RUN touch /var/log/cron.log
 
 ENTRYPOINT ["/entrypoint.sh"]
 
-CMD ["backup"]
+CMD ["cron_backup"]
