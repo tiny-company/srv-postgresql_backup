@@ -65,6 +65,33 @@ restore_restic_backup() {
 }
 
 ####################################################
+#         Postgresql restore 
+####################################################
+
+postgresql_restore() {
+### restore postgresql backup from restic restore at RESTORE_RESTIC_TARGET_DIR ###
+
+## create database if not exist
+    # for DB in ${POSTGRES_DB_RESTORE_LIST}; do
+    #     PG_RESTORE_START_TIME=$(date +%s)
+    #     log "postgresql restore process started on host : ${POSTGRES_HOST} for Database : ${DB}"
+
+    #     FILENAME=${BACKUP_POSTGRES_DIR}/${POSTGRES_HOST}.${DB}.${DATE}.dmp
+
+
+sudo -u postgres psql -c "CREATE DATABASE your_database_name IF NOT EXISTS;"
+
+## restore database from restic restore 
+sudo -u postgres pg_restore -d your_database_name /path/to/restore/location/your_dump_file.dmp
+
+pg_dump -h ${POSTGRES_HOST} -U ${POSTGRES_USERNAME}
+
+## set PG_RESTORE_SUCCESS
+
+}
+
+
+####################################################
 #         backup restore error
 ####################################################
 

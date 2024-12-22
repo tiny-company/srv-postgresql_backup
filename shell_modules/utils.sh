@@ -50,6 +50,23 @@ check_disk_space_availiability(){
 #                 Postgresql utils function
 ####################################################
 
+set_pg_credential() {
+### create the PGPASSFILE path and validate the rights ###
+    log "creating postgresql client config file at : ${PGPASSFILE}"
+    mkdir -p $(dirname "${PGPASSFILE}")
+    ( [ -e "${PGPASSFILE}" ] || touch "${PGPASSFILE}" ) && [ ! -w "${PGPASSFILE}" ] && error_exit "cannot write to ${PGPASSFILE}"
+    chmod 0600 ${PGPASSFILE}
+    chown $(id -un) ${PGPASSFILE}
+    set PGPASSFILE=$PGPASSFILE
+    for DB in ${POSTGRES_DB_LIST}; do
+        CREDENTIAL_LINE="${POSTGRES_HOST}:${POSTGRES_PORT}:${DB}:${POSTGRES_USERNAME}:${POSTGRES_PASS}"
+        ## if line doesn't already exist in file write it
+        if ! grep -q "$CREDENTIAL_LINE" "$PGPASSFILE" ; then
+            echo ${CREDENTIAL_LINE} >> ${PGPASSFILE}
+        fi
+    done
+}
+
 check_database_estimated_size() {
 ### Get the estimated postgresql database size using pg_database_size ###
     for DB in ${POSTGRES_DB_LIST}; do

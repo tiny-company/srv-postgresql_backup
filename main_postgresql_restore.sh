@@ -19,6 +19,12 @@ MANDATORY_VAR_LIST=("POSTGRES_DB_LIST" "POSTGRES_HOST" "POSTGRES_PORT" "POSTGRES
 ## temp restore var list :
 # RESTIC_REPOSITORY
 # RESTIC_PASSWORD
+# POSTGRES_HOST
+# POSTGRES_PORT
+# POSTGRES_USERNAME
+# POSTGRES_PASS
+# POSTGRES_DB_RESTORE_LIST
+
 
 ### utils parameters
 WORKDIR=${WORKDIR:-/srv}
@@ -80,7 +86,6 @@ if [ $? -ne 0 ]; then
 fi
 
 log " ==> new postgresql restore process started <=="
-
 ## Get snapshot_id from user input or set it to latest by default
 if [ -z "$RESTIC_SNAPSHOT_ID" ]; then
     RESTIC_SNAPSHOT_ID=$(restic snapshots --json | jq -r '.[0].id')
@@ -90,11 +95,15 @@ if [ -z "$RESTIC_SNAPSHOT_ID" ]; then
     fi
 fi
 
-# test space availility for the restore process 
+# Validate space availility for the restore process 
 if ${FEATURE_SIZE_CHECK} ; then
     check_restore_size || restore_failure_message
 fi
 
+## Set postgresql database credentials
+set_pg_credential || restore_failure_message
+
+## restore the restic backup from repository (get backup file)
 restore_restic_backup || restore_failure_message
 
 ## @TODO restore the content into the postgresql database 

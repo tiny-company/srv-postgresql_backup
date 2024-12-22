@@ -3,7 +3,7 @@
 # ------------------------------------------------------------------
 # - Filename: postgresql_backup.sh
 # - Author: ottomatic
-# - Dependency: log.sh
+# - Dependency: log.sh, utils.sh
 # - Description: Shell module for postgresql backup (with restic)
 # - Creation date: 2024-11-18
 # - Bash version: 5.2.15(1)-release
@@ -18,32 +18,8 @@ create_backup_path() {
 }
 
 ####################################################
-#         Postgresql credential configuration
-####################################################
-
-set_pg_credential() {
-    # create the PGPASSFILE path and validate the rights
-    log "creating postgresql client config file at : ${PGPASSFILE}"
-    mkdir -p $(dirname "${PGPASSFILE}")
-    ( [ -e "${PGPASSFILE}" ] || touch "${PGPASSFILE}" ) && [ ! -w "${PGPASSFILE}" ] && error_exit "cannot write to ${PGPASSFILE}"
-    chmod 0600 ${PGPASSFILE}
-    chown $(id -un) ${PGPASSFILE}
-    set PGPASSFILE=$PGPASSFILE
-    for DB in ${POSTGRES_DB_LIST}; do
-        CREDENTIAL_LINE="${POSTGRES_HOST}:${POSTGRES_PORT}:${DB}:${POSTGRES_USERNAME}:${POSTGRES_PASS}"
-        ## if line doesn't already exist in file write it
-        if ! grep -q "$CREDENTIAL_LINE" "$PGPASSFILE" ; then
-            echo ${CREDENTIAL_LINE} >> ${PGPASSFILE}
-        fi
-    done
-}
-
-####################################################
 #              Backup function
 ####################################################
-
-
-
 
 # resticprofile_configuration() {
 # ### configure restic parameters using restic profile ###
@@ -92,12 +68,10 @@ set_pg_credential() {
 # }
 
 restic_configuration() {
-### apply restic fonfiguration ###
-
+### apply restic fonfiguration using restic init ###
     if [ ! -d "$RESTIC_REPOSITORY" ]; then
         restic init --repo $RESTIC_REPOSITORY
     fi
-
 }
 
 postgresql_backup_restic() {

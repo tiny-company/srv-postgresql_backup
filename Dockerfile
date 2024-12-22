@@ -24,4 +24,6 @@ COPY --chmod=744 entrypoint/entrypoint.sh /entrypoint.sh
 
 RUN touch /var/log/cron.log
 
-CMD ["/entrypoint.sh"]
+ENTRYPOINT ["/entrypoint.sh"]
+
+CMD ["backup"]

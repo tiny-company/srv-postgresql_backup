@@ -13,6 +13,8 @@ A dokerized shell script that backup up a postgresql database based on cron, res
 
 @TODO :
 - cleanup pgdump after backup
+- make sure to handle multiple database backup and restore
+- manage multiple restic repository (directory, S3, ...)
 - hadolint
 
 💖 Credits to :
