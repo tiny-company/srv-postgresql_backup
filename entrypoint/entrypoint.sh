@@ -66,8 +66,6 @@ if [ "$#" -eq 0 ]; then
         sleep ${SLEEP_SEC_DURATION}
     done
 else
-    # Arguments passed, run the custom script with those arguments
-    exec ./custom_script.sh "$@"
     case "$1" in
         backup)
             ${WORKDIR}/main_postgresql_backup.sh
