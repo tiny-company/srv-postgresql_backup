@@ -102,7 +102,7 @@ if ${FEATURE_SIZE_CHECK} ; then
 fi
 
 # resticprofile_configuration || error_exit "$?"
-restic snapshots --quiet || restic_repo_init
+restic snapshots > /dev/null || restic_repo_init
 postgresql_backup_restic || error_exit "$?"
 
 if ${PG_DUMP_SUCCESS} ; then

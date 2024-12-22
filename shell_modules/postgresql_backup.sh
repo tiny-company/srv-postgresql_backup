@@ -84,15 +84,17 @@ postgresql_backup_restic() {
 
         FILENAME=${BACKUP_POSTGRES_DIR}/${POSTGRES_HOST}.${DB}.${DATE}.dmp
 
-
         PG_DUMP_RESULT=$(pg_dump -h ${POSTGRES_HOST} -U ${POSTGRES_USERNAME} -d ${DB} -j ${BACKUP_PARALELL_THREAD} -F ${BACKUP_FORMAT} --no-owner -f ${FILENAME} 2>&1)
         PG_DUMP_ELAPSED_TIME=$(( $(date +%s)-${PG_DUMP_START_TIME} ))
         if [ $? -eq 0 ];then
             ## temp debug log
-            log "backup database $DB} to filename : ${FILENAME}"
+            log "backup database ${DB} to filename : ${FILENAME}"
             BACKUP_FILE_DATA=$(ls -la ${FILENAME})
             log "backup data : ${BACKUP_FILE_DATA}"
             log "dump result output : ${PG_DUMP_RESULT}"
+            log "========================="
+            TABLE_LIST=$(psql -h ${POSTGRES_HOST} -U ${POSTGRES_USERNAME} -d ${DB} -c "\dt")
+            log "${TABLE_LIST}"
             ## 
             log "postgresql dump process ended (in success) for Database : ${DB} in $(($PG_DUMP_ELAPSED_TIME/60)) min $(($PG_DUMP_ELAPSED_TIME%60)) sec"
             PG_DUMP_SUCCESS=true
