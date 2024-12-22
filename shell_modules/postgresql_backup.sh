@@ -67,13 +67,10 @@ create_backup_path() {
 #     chmod 0600 ${RESTICPROFILE_CONFIG_PATH}/${RESTICPROFILE_PASSWORD_FILENAME}
 # }
 
-restic_configuration() {
-### apply restic configuration using restic init ###
-    restic init --quiet
-    if [ $? -ne 0 ]; then
-        log "creating restic repository"
-        restic init --repo $RESTIC_REPOSITORY 2>&1
-    fi
+restic_repo_init() {
+### init restic repository ###
+    log "creating restic repository"
+    restic init --repo $RESTIC_REPOSITORY 2>&1
 }
 
 postgresql_backup_restic() {
