@@ -20,6 +20,8 @@ A dokerized shell script that backup up a postgresql database based on cron, res
 
 ## Usage
 
+### backup usage
+
 1. First set the env var (i.e : with "env" or "env_file" arg for docker-compose) :
 
 - mandatory variables :
@@ -67,6 +69,22 @@ A dokerized shell script that backup up a postgresql database based on cron, res
 
 ```
 docker compose up -d
+```
+
+### restore usage
+
+To restore from a postgresql backup from a restic repository.
+
+1. Set restoration mandatory env var :
+```
+@TODO
+RESTIC_REPOSITORY=""
+RESTIC_PASSWORD=""
+```
+
+2. start a new container with restore command :
+```
+docker run --rm -d
 ```
 
 ## Sources :

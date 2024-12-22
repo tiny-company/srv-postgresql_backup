@@ -59,8 +59,31 @@ if [ $? -ne 0 ]; then
     error_exit "mandatory variables above not set, see previous logs to see which, exiting"
 fi
 
-# loop
-while true; do
-    ${WORKDIR}/main_postgresql_backup.sh
-    sleep ${SLEEP_SEC_DURATION}
-done
+if [ "$#" -eq 0 ]; then
+    # No arguments passed, run the default script
+    while true; do
+        ${WORKDIR}/main_postgresql_backup.sh
+        sleep ${SLEEP_SEC_DURATION}
+    done
+else
+    # Arguments passed, run the custom script with those arguments
+    exec ./custom_script.sh "$@"
+    case "$1" in
+        backup)
+            ${WORKDIR}/main_postgresql_backup.sh
+            ;;
+        restore)
+            if [ $# -ge 2 ]; then
+                RESTIC_SNAPSHOT_ID=$2
+            fi
+            ${WORKDIR}/shell_modules/main_postgresql_restore.sh
+            ;;
+        *)
+            error "Error: Unrecognized command '$1'."
+            warn "Available command : "
+            warn "backup"
+            warn "restore <restic_snapshot_id>"
+    esac
+
+fi
+

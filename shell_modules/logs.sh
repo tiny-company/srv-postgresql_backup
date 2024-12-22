@@ -35,39 +35,74 @@ validate_log_path() {
 
 warn() {
 ### log as warn level ###
-    if ${LOG_STD_OUTPUT}; then
-        echo "[$(date '+%Y-%m-%d %H:%M:%S')] ${ORANGE}WARN : $@ ${NC}"
+    if ${LOG_COLORED}; then
+        if ${LOG_STD_OUTPUT}; then
+            echo "[$(date '+%Y-%m-%d %H:%M:%S')] ${ORANGE}WARN : $@ ${NC}"
+        else
+            echo "[$(date '+%Y-%m-%d %H:%M:%S')] ${ORANGE}WARN : $@ ${NC}" >> ${LOG_FILE}
+        fi
     else
-        echo "[$(date '+%Y-%m-%d %H:%M:%S')] ${ORANGE}WARN : $@ ${NC}" >> ${LOG_FILE}
+        if ${LOG_STD_OUTPUT}; then
+            echo "[$(date '+%Y-%m-%d %H:%M:%S')] WARN : $@"
+        else
+            echo "[$(date '+%Y-%m-%d %H:%M:%S')] WARN : $@" >> ${LOG_FILE}
+        fi
     fi
 }
 
 error() {
 ### log as error level ###
-    if ${LOG_STD_OUTPUT}; then
-        echo "[$(date '+%Y-%m-%d %H:%M:%S')] ${RED}ERROR : $@ ${NC}"
+    if ${LOG_COLORED}; then
+        if ${LOG_STD_OUTPUT}; then
+            echo "[$(date '+%Y-%m-%d %H:%M:%S')] ${RED}ERROR : $@ ${NC}"
+        else
+            echo "[$(date '+%Y-%m-%d %H:%M:%S')] ${RED}ERROR : $@ ${NC}" >> ${LOG_FILE}
+        fi
     else
-        echo "[$(date '+%Y-%m-%d %H:%M:%S')] ${RED}ERROR : $@ ${NC}" >> ${LOG_FILE}
+        if ${LOG_STD_OUTPUT}; then
+            echo "[$(date '+%Y-%m-%d %H:%M:%S')] ERROR : $@"
+        else
+            echo "[$(date '+%Y-%m-%d %H:%M:%S')] ERROR : $@" >> ${LOG_FILE}
+        fi
     fi
 }
 
 log() {
 ### log as classic log level ###
-    if ${LOG_STD_OUTPUT}; then
-        echo "[$(date '+%Y-%m-%d %H:%M:%S')] ${BLUE}INFO : $@ ${NC}"
+    if ${LOG_COLORED}; then
+        if ${LOG_STD_OUTPUT}; then
+            echo "[$(date '+%Y-%m-%d %H:%M:%S')] ${BLUE}INFO : $@ ${NC}"
+        else
+            echo "[$(date '+%Y-%m-%d %H:%M:%S')] ${BLUE}INFO : $@ ${NC}" >> ${LOG_FILE}
+        fi
     else
-        echo "[$(date '+%Y-%m-%d %H:%M:%S')] ${BLUE}INFO : $@ ${NC}" >> ${LOG_FILE}
+        if ${LOG_STD_OUTPUT}; then
+            echo "[$(date '+%Y-%m-%d %H:%M:%S')] INFO : $@"
+        else
+            echo "[$(date '+%Y-%m-%d %H:%M:%S')] INFO : $@" >> ${LOG_FILE}
+        fi
     fi
 }
 
 error_exit() {
 ### log as error level and exit ###
-    if ${LOG_STD_OUTPUT}; then
-        echo "[$(date '+%Y-%m-%d %H:%M:%S')] ${RED}ERROR : $1 ${NC}"
-        exit 1
+    if ${LOG_COLORED}; then
+        if ${LOG_STD_OUTPUT}; then
+            echo "[$(date '+%Y-%m-%d %H:%M:%S')] ${RED}ERROR : $1 ${NC}"
+            exit 1
+        else
+            echo "Error: $1"
+            echo "[$(date '+%Y-%m-%d %H:%M:%S')] ${RED}ERROR : $1 ${NC}" >> ${LOG_FILE}
+            exit 1
+        fi
     else
-        echo "Error: $1"
-        echo "[$(date '+%Y-%m-%d %H:%M:%S')] ${RED}ERROR : $1 ${NC}" >> ${LOG_FILE}
-        exit 1
+        if ${LOG_STD_OUTPUT}; then
+            echo "[$(date '+%Y-%m-%d %H:%M:%S')] ERROR : $1"
+            exit 1
+        else
+            echo "Error: $1"
+            echo "[$(date '+%Y-%m-%d %H:%M:%S')] ERROR : $1" >> ${LOG_FILE}
+            exit 1
+        fi
     fi
 }
