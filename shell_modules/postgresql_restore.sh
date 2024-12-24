@@ -106,10 +106,10 @@ postgresql_restore() {
         ## restore database from restic restore
         PG_RESTORE_DB_START_TIME=$(date +%s)
         log "postgresql restore process started on host : ${POSTGRES_HOST} for Database : ${DB}"
-        PG_RESTORE_RESULT=$(pg_restore -h ${POSTGRES_HOST} -U ${POSTGRES_USERNAME} -d ${DB} -C --clean $BACKUP_DMP_FILENAME)
+        PG_RESTORE_RESULT=$(pg_restore -h ${POSTGRES_HOST} -U ${POSTGRES_USERNAME} -d ${DB} -j ${RESTORE_PARALELL_THREAD} --clean --if-exists --create --exit-on-error --format=custom $BACKUP_DMP_FILENAME)
         if [ $? -ne 0 ]; then
             PG_RESTORE_ELAPSED_TIME=$(( $(date +%s)-${PG_RESTORE_DB_START_TIME} ))
-            error "postgresql restore process ended (in error) in $(($PG_RESTORE_ELAPSED_TIME/60)) min $(($PG_RESTORE_ELAPSED_TIME%60)) sec"
+            error "postgresql database restore process ended (in error) in $(($PG_RESTORE_ELAPSED_TIME/60)) min $(($PG_RESTORE_ELAPSED_TIME%60)) sec"
             error $PG_RESTORE_RESULT
             PG_RESTORE_SUCCESS=false
             return 1
