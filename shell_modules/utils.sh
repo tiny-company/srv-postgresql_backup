@@ -10,6 +10,13 @@
 # ------------------------------------------------------------------
 
 ####################################################
+#                    Parameters
+####################################################
+
+### postgresql database parameters
+POSTGRESQL_DEFAULT_DB=("postgres" "template0" "template1")
+
+####################################################
 #                 Common utils function
 ####################################################
 
@@ -62,10 +69,12 @@ set_pg_credential() {
     set PGPASSFILE=$PGPASSFILE
 
     ## add default line for postgres DB
-    DEFAULT_PGPASS_LINE="${POSTGRES_HOST}:${POSTGRES_PORT}:template1:${POSTGRES_USERNAME}:${POSTGRES_PASS}"
-    if ! grep -q "$DEFAULT_PGPASS_LINE" "$PGPASSFILE" ; then
-        echo ${DEFAULT_PGPASS_LINE} >> ${PGPASSFILE}
-    fi
+    for DB in ${POSTGRESQL_DEFAULT_DB}; do
+        CREDENTIAL_LINE="${POSTGRES_HOST}:${POSTGRES_PORT}:${DB}:${POSTGRES_USERNAME}:${POSTGRES_PASS}"
+        if ! grep -q "$CREDENTIAL_LINE" "$PGPASSFILE" ; then
+            echo ${CREDENTIAL_LINE} >> ${PGPASSFILE}
+        fi
+    done
 
     ## add line for each DB
     for DB in ${POSTGRES_DB_LIST}; do

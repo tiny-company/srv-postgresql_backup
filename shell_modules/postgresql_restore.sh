@@ -106,8 +106,6 @@ postgresql_restore() {
         log "postgresql (${DB}) getting dump file process ended (in success) in $(($PG_DMP_FILE_ELAPSED_TIME/60)) min $(($PG_DMP_FILE_ELAPSED_TIME%60)) sec"
 
         ## Get ride of existing database connection
-
-        # Check if the database exists
         if psql -h ${POSTGRES_HOST} -U ${POSTGRES_USERNAME} -d postgres -tAc "SELECT 1 FROM pg_database WHERE datname='$DB'" | grep -q 1; then
             PG_TERMINATE_CONN_DB_START_TIME=$(date +%s)
             log "postgresql connection termination process started on host : ${POSTGRES_HOST} for Database : ${DB}"
