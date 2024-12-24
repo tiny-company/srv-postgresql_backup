@@ -32,52 +32,6 @@ backup_failure_message() {
 #              Backup function
 ####################################################
 
-# resticprofile_configuration() {
-# ### configure restic parameters using restic profile ###
-#     log "checking if resticprofile is installed"
-#     if [ ! -f "/usr/local/bin/resticprofile" ] ; then
-#         log "resticprofile not found in '/usr/local/bin/resticprofile' "
-#         log "installing restic profile from githubusercontent"
-#         CURL_RESULT_CODE=$(curl -s -LO https://raw.githubusercontent.com/creativeprojects/resticprofile/master/install.sh -w %{http_code} --output-dir /tmp)
-#         if [ "${CURL_RESULT_CODE}" = "200" ]; then
-#             log "launching install script for restic profile"
-#             chmod +x /tmp/install.sh
-#             /tmp/install.sh -b /usr/local/bin 2>&1 >/dev/null
-#         else
-#             ELAPSED_TIME=$(( $(date +%s)-${START_TIME} ))
-#             error "backup failure, caused by resticprofile installation fail in $(($ELAPSED_TIME/60)) min $(($ELAPSED_TIME%60)) sec"
-#             error_exit "$?"
-#         fi
-#     else
-#         log "resticprofile already installed"
-#     fi
-
-#     log "updating resticprofile"
-#     resticprofile self-update >/dev/null
-
-#     log "setting resticprofile configuration"
-#     mkdir -p ${RESTICPROFILE_CONFIG_PATH}
-#     ( [ -e "${RESTICPROFILE_CONFIG_PATH}/profile.yml" ] || cp ${WORKDIR}/resticprofile/profile.yml ${RESTICPROFILE_CONFIG_PATH}/profile.yml )
-#     chmod 0700 ${RESTICPROFILE_CONFIG_PATH}/profile.yml
-#     if [ -z ${RESTIC_PASSWORD+x} ] ; then
-#         log "restic password not set by user, generate random key"
-#         resticprofile generate --random-key ${RESTICPROFILE_PASSWORD_LENGTH} > ${RESTICPROFILE_CONFIG_PATH}/${RESTICPROFILE_PASSWORD_FILENAME}
-#     else
-#         log "setting user defined restic password to file ${RESTICPROFILE_CONFIG_PATH}/${RESTICPROFILE_PASSWORD_FILENAME}"
-#         ## debug try to create pass file before updating content
-#         touch ${RESTICPROFILE_CONFIG_PATH}/${RESTICPROFILE_PASSWORD_FILENAME}
-#         echo ${RESTIC_PASSWORD} > ${RESTICPROFILE_CONFIG_PATH}/${RESTICPROFILE_PASSWORD_FILENAME}*
-#         ## more debug
-#         if [ $? -eq 0 ];then
-#             log "touch and echo pass in file in success"
-#         else
-#             warn "touch and echo pass in file failure"
-#         fi
-
-#     fi
-#     chmod 0600 ${RESTICPROFILE_CONFIG_PATH}/${RESTICPROFILE_PASSWORD_FILENAME}
-# }
-
 restic_repo_init() {
 ### init restic repository ###
     log "creating restic repository"
@@ -95,12 +49,9 @@ postgresql_backup_restic() {
 
         FILENAME=${BACKUP_POSTGRES_DIR}/${POSTGRES_HOST}.${DB}.${DATE}.dmp
 
-        PG_DUMP_RESULT=$(pg_dump -h ${POSTGRES_HOST} -U ${POSTGRES_USERNAME} -d ${DB} -F c -f ${FILENAME})
+        PG_DUMP_RESULT=$(pg_dump -h ${POSTGRES_HOST} -U ${POSTGRES_USERNAME} -d ${DB} -j ${BACKUP_PARALELL_THREAD} -F ${BACKUP_FORMAT} --no-owner -f ${FILENAME})
         PG_DUMP_ELAPSED_TIME=$(( $(date +%s)-${PG_DUMP_START_TIME} ))
         if [ $? -eq 0 ];then
-            ## temp debug log
-            log "dump result output : ${PG_DUMP_RESULT}"
-            ## 
             log "postgresql dump process ended (in success) for Database : ${DB} in $(($PG_DUMP_ELAPSED_TIME/60)) min $(($PG_DUMP_ELAPSED_TIME%60)) sec"
             PG_DUMP_SUCCESS=true
         else

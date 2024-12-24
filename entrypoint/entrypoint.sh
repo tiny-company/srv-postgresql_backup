@@ -74,7 +74,7 @@ else
             if [ $# -ge 2 ]; then
                 RESTIC_SNAPSHOT_ID=$2
             fi
-            ${WORKDIR}/shell_modules/main_postgresql_restore.sh
+            ${WORKDIR}/main_postgresql_restore.sh
             ;;
         *)
             error "Error: Unrecognized command '$1'."
