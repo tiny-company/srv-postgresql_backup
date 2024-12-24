@@ -18,7 +18,7 @@ check_restore_size() {
     FULL_RESTORE_SIZE=$(restic --json stats ${RESTIC_SNAPSHOT_ID} | jq -r .total_size)
     FULL_RESTORE_SIZE_FOR_LOG=$(convert_kib_to_gb ${FULL_RESTORE_SIZE})
     if [ -n "$FULL_RESTORE_SIZE" ]; then
-        log "Full restore size of snapshot ${RESTIC_SNAPSHOT_ID}: $FULL_RESTORE_SIZE_FOR_LOG GB"
+        log "Full restore size of snapshot ${RESTIC_SNAPSHOT_ID} is : $FULL_RESTORE_SIZE_FOR_LOG GB"
         check_restore_disk_space_available || return 1
     else
         error "Error while getting the snapshot total size : restic stats return empty value"
@@ -107,6 +107,7 @@ postgresql_restore() {
         ## get backup dmp file from restic repo
         PG_DMP_FILE_DB_START_TIME=$(date +%s)
         log "postgresql getting dump file process started on host : ${POSTGRES_HOST} for Database : ${DB}"
+        mkdir -p ${RESTORE_RESTIC_TARGET_DIR}
         BACKUP_DMP_FILENAME=$(find ${RESTORE_RESTIC_TARGET_DIR} -type f -name "*${DB}*.dmp")
         if [ -z "${BACKUP_DMP_FILENAME+x}" ];then 
             PG_DMP_FILE_ELAPSED_TIME=$(( $(date +%s)-${PG_DMP_FILE_DB_START_TIME} ))
