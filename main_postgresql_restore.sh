@@ -88,7 +88,7 @@ fi
 
 log " ==> new postgresql restore process started <=="
 ## Get snapshot_id from user input or set it to latest by default
-if [ -z "$RESTIC_SNAPSHOT_ID" ]; then
+if [ -z "$RESTIC_SNAPSHOT_ID+x" ]; then
     RESTIC_SNAPSHOT_ID=$(restic snapshots --json | jq -r '.[0].id')
     if [ -z "$RESTIC_SNAPSHOT_ID" ]; then
         error "No snapshots found in restic repository : $RESTIC_REPOSITORY"
