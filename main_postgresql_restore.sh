@@ -16,6 +16,9 @@ set -euo pipefail
 ####################################################
 MANDATORY_VAR_LIST=("POSTGRES_DB_RESTORE_LIST" "POSTGRES_HOST" "POSTGRES_PORT" "POSTGRES_USERNAME" "POSTGRES_PASS" "RESTIC_REPOSITORY" "RESTIC_PASSWORD" "AWS_ACCESS_KEY_ID" "AWS_SECRET_ACCESS_KEY")
 
+### Feature activation
+FEATURE_SIZE_CHECK=${FEATURE_SIZE_CHECK:-true}
+
 ### utils parameters
 WORKDIR=${WORKDIR:-/srv}
 START_TIME=$(date +%s)

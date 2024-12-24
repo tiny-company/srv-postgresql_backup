@@ -67,12 +67,6 @@ AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
 AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION:-fr-par}
 AWS_REGION=${AWS_DEFAULT_REGION}
 
-### resticprofile parameters
-RESTICPROFILE_CONFIG_PATH=${RESTICPROFILE_CONFIG_PATH:-/root/resticprofile}
-RESTICPROFILE_PASSWORD_LENGTH=${RESTICPROFILE_PASSWORD_LENGTH:-2048}
-RESTICPROFILE_PASSWORD_FILENAME=${RESTICPROFILE_PASSWORD_FILENAME:-password.key}
-PROMETHEUS_URL=${PROMETHEUS_URL:-}
-
 ####################################################
 #                    Dependencies
 ####################################################
@@ -103,7 +97,6 @@ if ${FEATURE_SIZE_CHECK} ; then
     check_disk_space_availiability || backup_failure_message
 fi
 
-# resticprofile_configuration || error_exit "$?"
 restic snapshots > /dev/null || restic_repo_init
 postgresql_backup_restic || error_exit "$?"
 
