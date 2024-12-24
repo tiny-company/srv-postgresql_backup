@@ -91,6 +91,8 @@ if [ -z "${RESTIC_SNAPSHOT_ID+x}" ]; then
 fi
 log "Restore started using restic snapshot id : $RESTIC_SNAPSHOT_ID"
 
+mkdir -p ${RESTORE_RESTIC_TARGET_DIR}
+
 # Validate space availility for the restore process 
 if ${FEATURE_SIZE_CHECK} ; then
     check_restore_size || restore_failure_message

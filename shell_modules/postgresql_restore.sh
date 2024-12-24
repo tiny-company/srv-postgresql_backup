@@ -40,7 +40,7 @@ check_restore_disk_space_available() {
         fi
     else
         error "cannot found the mount point : ${RESTORE_RESTIC_TARGET_DIR}, the disk space check is skipped"
-        return 1
+        return 0
     fi
 }
 
@@ -107,7 +107,6 @@ postgresql_restore() {
         ## get backup dmp file from restic repo
         PG_DMP_FILE_DB_START_TIME=$(date +%s)
         log "postgresql getting dump file process started on host : ${POSTGRES_HOST} for Database : ${DB}"
-        mkdir -p ${RESTORE_RESTIC_TARGET_DIR}
         BACKUP_DMP_FILENAME=$(find ${RESTORE_RESTIC_TARGET_DIR} -type f -name "*${DB}*.dmp")
         if [ -z "${BACKUP_DMP_FILENAME+x}" ];then 
             PG_DMP_FILE_ELAPSED_TIME=$(( $(date +%s)-${PG_DMP_FILE_DB_START_TIME} ))
