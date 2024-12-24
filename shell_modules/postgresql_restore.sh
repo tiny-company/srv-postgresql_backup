@@ -90,20 +90,6 @@ postgresql_restore() {
 ### restore postgresql backup from restic restore at RESTORE_RESTIC_TARGET_DIR ###
     for DB in ${RESTORE_POSTGRES_DB_LIST}; do
 
-        ## create database if not exist 
-        ## (not using "pg_restore -C --clean" in order to separate steps and errors)
-        PG_CREATE_DB_START_TIME=$(date +%s)
-        log "postgresql create DB process started on host : ${POSTGRES_HOST} for Database : ${DB}"
-        CREATE_DB_RESULT=$(psql -h ${POSTGRES_HOST} -U ${POSTGRES_USERNAME} -d ${DB} -c "CREATE DATABASE ${DB} IF NOT EXISTS;")
-        if [ $? -ne 0 ]; then
-            PG_CREATE_DB_ELAPSED_TIME=$(( $(date +%s)-${PG_CREATE_DB_START_TIME} ))
-            error "postgresql create DB (${DB}) process ended (in error) in $(($PG_CREATE_DB_ELAPSED_TIME/60)) min $(($PG_CREATE_DB_ELAPSED_TIME%60)) sec"
-            error $CREATE_DB_RESULT
-            PG_RESTORE_SUCCESS=false
-            return 1
-            break
-        fi
-
         ## get backup dmp file from restic repo
         PG_DMP_FILE_DB_START_TIME=$(date +%s)
         log "postgresql getting dump file process started on host : ${POSTGRES_HOST} for Database : ${DB}"
@@ -120,7 +106,7 @@ postgresql_restore() {
         ## restore database from restic restore
         PG_RESTORE_DB_START_TIME=$(date +%s)
         log "postgresql restore process started on host : ${POSTGRES_HOST} for Database : ${DB}"
-        PG_RESTORE_RESULT=$(pg_restore -h ${POSTGRES_HOST} -U ${POSTGRES_USERNAME} -d ${DB} $BACKUP_DMP_FILENAME)
+        PG_RESTORE_RESULT=$(pg_restore -h ${POSTGRES_HOST} -U ${POSTGRES_USERNAME} -d ${DB} -C --clean $BACKUP_DMP_FILENAME)
         if [ $? -ne 0 ]; then
             PG_RESTORE_ELAPSED_TIME=$(( $(date +%s)-${PG_RESTORE_DB_START_TIME} ))
             error "postgresql restore process ended (in error) in $(($PG_RESTORE_ELAPSED_TIME/60)) min $(($PG_RESTORE_ELAPSED_TIME%60)) sec"
