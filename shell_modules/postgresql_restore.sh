@@ -15,7 +15,7 @@
 
 check_restore_size() {
 ### check restic snapshot size ###
-    FULL_RESTORE_SIZE=$(restic --json -r ${OPEN_PROJECT_RESTIC_REPO} stats ${RESTIC_SNAPSHOT_ID} | jq -r .total_size)
+    FULL_RESTORE_SIZE=$(restic --json stats ${RESTIC_SNAPSHOT_ID} | jq -r .total_size)
     FULL_RESTORE_SIZE_FOR_LOG=$(convert_kib_to_gb ${FULL_RESTORE_SIZE})
     if [ -n "$FULL_RESTORE_SIZE" ]; then
         log "Full restore size of snapshot ${RESTIC_SNAPSHOT_ID}: $FULL_RESTORE_SIZE_FOR_LOG GB"
