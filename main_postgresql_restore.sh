@@ -14,7 +14,7 @@ set -euo pipefail
 ####################################################
 #                    Parameters
 ####################################################
-MANDATORY_VAR_LIST=("POSTGRES_DB_RESTORE_LIST" "POSTGRES_HOST" "POSTGRES_PORT" "POSTGRES_USERNAME" "POSTGRES_PASS" "RESTIC_REPOSITORY" "RESTIC_PASSWORD" "AWS_ACCESS_KEY_ID" "AWS_SECRET_ACCESS_KEY")
+MANDATORY_VAR_LIST=("RESTORE_POSTGRES_DB_LIST" "POSTGRES_HOST" "POSTGRES_PORT" "POSTGRES_USERNAME" "POSTGRES_PASS" "RESTIC_REPOSITORY" "RESTIC_PASSWORD" "AWS_ACCESS_KEY_ID" "AWS_SECRET_ACCESS_KEY")
 
 ### Feature activation
 FEATURE_SIZE_CHECK=${FEATURE_SIZE_CHECK:-true}
@@ -83,7 +83,7 @@ fi
 log " ==> new postgresql restore process started <=="
 ## Get snapshot_id from user input or set it to latest by default
 if [ -z "${RESTIC_SNAPSHOT_ID+x}" ]; then
-    RESTIC_SNAPSHOT_ID=$(restic snapshots --json | jq -r '.[0].id')
+    RESTIC_SNAPSHOT_ID=$(restic snapshots --json | jq -r '.[-1].id')
     if [ -z "$RESTIC_SNAPSHOT_ID" ]; then
         error "No snapshots found in restic repository : $RESTIC_REPOSITORY"
         restore_failure_message

@@ -24,6 +24,12 @@ checkMandatoryVariable() {
     done
 }
 
+convert_kib_to_gb() {
+    kib=$1
+    gb=$(echo "scale=6; $kib / (1024 * 1024)" | bc)
+    return $gb
+}
+
 ####################################################
 #                 Disk utils function
 ####################################################

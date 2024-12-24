@@ -15,9 +15,10 @@
 
 check_restore_size() {
 ### check restic snapshot size ###
-    FULL_RESTORE_SIZE=$(restic stats --mode json | jq -r --arg SNAPSHOT_ID "${RESTIC_SNAPSHOT_ID}" '.snapshots[] | select(.id == ${RESTIC_SNAPSHOT_ID}) | .total_size')
+    FULL_RESTORE_SIZE=$(restic --json -r ${OPEN_PROJECT_RESTIC_REPO} stats ${RESTIC_SNAPSHOT_ID} | jq -r .total_size)
+    FULL_RESTORE_SIZE_FOR_LOG=$(convert_kib_to_gb ${FULL_RESTORE_SIZE})
     if [ -n "$FULL_RESTORE_SIZE" ]; then
-        log "Full restore size of snapshot ${RESTIC_SNAPSHOT_ID}: $FULL_RESTORE_SIZE bytes"
+        log "Full restore size of snapshot ${RESTIC_SNAPSHOT_ID}: $FULL_RESTORE_SIZE_FOR_LOG GB"
         check_restore_disk_space_available || return 1
     else
         error "Error while getting the snapshot total size : restic stats return empty value"
@@ -32,8 +33,8 @@ check_restore_disk_space_available() {
     # strip any non numeric character in SPACE_AVAILABLE
     SPACE_AVAILABLE=$(echo ${SPACE_AVAILABLE} | sed 's/[^0-9]*//g')
     if [ "${SPACE_AVAILABLE}" != "" ] ;then
-        log "restic snapshot size: ${FULL_RESTORE_SIZE}GB and space available : ${SPACE_AVAILABLE}GB"
-        if [ ${FULL_RESTORE_SIZE} -gt ${SPACE_AVAILABLE} ];then
+        log "restic snapshot size: ${FULL_RESTORE_SIZE_FOR_LOG} GB and space available : ${SPACE_AVAILABLE}GB"
+        if [ ${FULL_RESTORE_SIZE_FOR_LOG} -gt ${SPACE_AVAILABLE} ];then
             error "Not enough disk available for the backup, aborting"
             return 1
         fi
@@ -87,7 +88,7 @@ restore_restic_remove_restore_file() {
 
 postgresql_restore() {
 ### restore postgresql backup from restic restore at RESTORE_RESTIC_TARGET_DIR ###
-    for DB in ${POSTGRES_DB_RESTORE_LIST}; do
+    for DB in ${RESTORE_POSTGRES_DB_LIST}; do
 
         ## create database if not exist 
         ## (not using "pg_restore -C --clean" in order to separate steps and errors)
@@ -143,5 +144,5 @@ restore_failure_message() {
 ### default restore failure message ###
     ELAPSED_TIME=$(( $(date +%s)-${RESTORE_START_TIME} ))
     error "postgresql restore process ended (in error) in $(($ELAPSED_TIME/60)) min $(($ELAPSED_TIME%60)) sec"
-    error "backup failure on ${POSTGRES_HOST}."
+    error_exit "restore failure on ${POSTGRES_HOST}."
 }
