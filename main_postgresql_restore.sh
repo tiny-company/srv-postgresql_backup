@@ -14,17 +14,7 @@ set -euo pipefail
 ####################################################
 #                    Parameters
 ####################################################
-MANDATORY_VAR_LIST=("POSTGRES_DB_LIST" "POSTGRES_HOST" "POSTGRES_PORT" "POSTGRES_USERNAME" "POSTGRES_PASS" "RESTIC_REPOSITORY" "RESTIC_PASSWORD" "AWS_ACCESS_KEY_ID" "AWS_SECRET_ACCESS_KEY")
-
-## temp restore var list :
-# RESTIC_REPOSITORY
-# RESTIC_PASSWORD
-# POSTGRES_HOST
-# POSTGRES_PORT
-# POSTGRES_USERNAME
-# POSTGRES_PASS
-# POSTGRES_DB_RESTORE_LIST
-
+MANDATORY_VAR_LIST=("POSTGRES_DB_RESTORE_LIST" "POSTGRES_HOST" "POSTGRES_PORT" "POSTGRES_USERNAME" "POSTGRES_PASS" "RESTIC_REPOSITORY" "RESTIC_PASSWORD" "AWS_ACCESS_KEY_ID" "AWS_SECRET_ACCESS_KEY")
 
 ### utils parameters
 WORKDIR=${WORKDIR:-/srv}
@@ -64,6 +54,7 @@ AWS_REGION=${AWS_DEFAULT_REGION}
 ## backup and restore parameters
 BACKUP_POSTGRES_DIR_MOUNT_POINT=${BACKUP_POSTGRES_DIR_MOUNT_POINT:-/}
 RESTORE_RESTIC_TARGET_DIR=${RESTORE_RESTIC_TARGET_DIR:-/restore}
+RESTORE_POSTGRES_DB_LIST=${RESTORE_POSTGRES_DB_LIST:-$POSTGRES_DB_LIST}
 
 ####################################################
 #                    Dependencies
@@ -95,6 +86,7 @@ if [ -z "${RESTIC_SNAPSHOT_ID+x}" ]; then
         restore_failure_message
     fi
 fi
+log "Restore started using restic snapshot id : $RESTIC_SNAPSHOT_ID"
 
 # Validate space availility for the restore process 
 if ${FEATURE_SIZE_CHECK} ; then
@@ -107,16 +99,16 @@ set_pg_credential || restore_failure_message
 ## restore the restic backup from repository (get backup file)
 restore_restic_backup || restore_failure_message
 
-## @TODO restore the content into the postgresql database 
+## restore the content into the postgresql database 
 postgresql_restore || restore_failure_message
 
-## @TODO check database working using pgready
-if ${PG_RESTORE_SUCCESS} ; then
-    postgresql_check_readiness || error_exit "$?"
-fi
+## remove temp backup content (from restic restore step)
+restore_restic_remove_restore_file || restore_failure_message
 
-## @TODO remove backup content 
-#
+## check database working using pgready
+if ${PG_RESTORE_SUCCESS} ; then
+    postgresql_check_readiness
+fi
 
 ELAPSED_TIME=$(( $(date +%s)-${START_TIME} ))
 log "postgresql restore process finished in $(($ELAPSED_TIME/60)) min $(($ELAPSED_TIME%60)) sec"

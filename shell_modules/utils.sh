@@ -84,7 +84,6 @@ check_database_estimated_size() {
 
 postgresql_check_readiness() {
 ### check if postgresql database is ready using pg_isready ###
-    DATABASE_READYNESS=false
     until pg_isready -q -h ${POSTGRES_HOST} -U ${POSTGRES_USERNAME} -d ${DB}
     do
         if [ ${PG_READY_RETRY_THRESHOLD} -gt 0 ]; then
