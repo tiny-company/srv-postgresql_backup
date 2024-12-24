@@ -22,7 +22,7 @@ COPY --chmod=744 main_postgresql_restore.sh ${WORKDIR}/main_postgresql_restore.s
 COPY --chmod=744 entrypoint/entrypoint.sh /entrypoint.sh
 
 RUN ln -s /${WORKDIR}/main_postgresql_backup.sh /usr/bin/backup && \
-    ln -s /${WORKDIR}/main_postgresql_restore.sh /usr/bin/restore && \
+    ln -s /${WORKDIR}/main_postgresql_restore.sh /usr/bin/restore
 
 ENTRYPOINT ["/entrypoint.sh"]
 
