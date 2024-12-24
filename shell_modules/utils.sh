@@ -26,8 +26,8 @@ checkMandatoryVariable() {
 
 convert_kib_to_gb() {
     kib=$1
-    gb=$(echo "scale=6; $kib / (1024 * 1024)" | bc)
-    return $gb
+    gb_value=$(echo "scale=6; $kib / (1024 * 1024)" | bc)
+    echo $gb_value
 }
 
 ####################################################
