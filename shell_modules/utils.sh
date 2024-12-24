@@ -62,7 +62,7 @@ set_pg_credential() {
     set PGPASSFILE=$PGPASSFILE
 
     ## add default line for postgres DB
-    DEFAULT_PGPASS_LINE="${POSTGRES_HOST}:${POSTGRES_PORT}:postgres:${POSTGRES_USERNAME}:${POSTGRES_PASS}"
+    DEFAULT_PGPASS_LINE="${POSTGRES_HOST}:${POSTGRES_PORT}:template1:${POSTGRES_USERNAME}:${POSTGRES_PASS}"
     if ! grep -q "$DEFAULT_PGPASS_LINE" "$PGPASSFILE" ; then
         echo ${DEFAULT_PGPASS_LINE} >> ${PGPASSFILE}
     fi
