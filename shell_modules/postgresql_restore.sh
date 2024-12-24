@@ -102,6 +102,7 @@ postgresql_restore() {
             return 1
             break
         fi
+        PG_DMP_FILE_ELAPSED_TIME=$(( $(date +%s)-${PG_DMP_FILE_DB_START_TIME} ))
         log "postgresql (${DB}) getting dump file process ended (in success) in $(($PG_TERMINATE_CONN_ELAPSED_TIME/60)) min $(($PG_TERMINATE_CONN_ELAPSED_TIME%60)) sec"
 
         ## Get ride of existing database connection
@@ -116,6 +117,7 @@ postgresql_restore() {
             return 1
             break
         fi
+        PG_TERMINATE_CONN_ELAPSED_TIME=$(( $(date +%s)-${PG_TERMINATE_CONN_DB_START_TIME} ))
         log "postgresql (${DB}) connection termination process ended (in success) in $(($PG_TERMINATE_CONN_ELAPSED_TIME/60)) min $(($PG_TERMINATE_CONN_ELAPSED_TIME%60)) sec"
 
         ## restore database from restic restore
@@ -130,6 +132,7 @@ postgresql_restore() {
             return 1
             break
         fi
+        PG_RESTORE_ELAPSED_TIME=$(( $(date +%s)-${PG_RESTORE_DB_START_TIME} ))
         log "postgresql database ${DB} restore process ended (in success) in $(($PG_TERMINATE_CONN_ELAPSED_TIME/60)) min $(($PG_TERMINATE_CONN_ELAPSED_TIME%60)) sec"
     done
 
