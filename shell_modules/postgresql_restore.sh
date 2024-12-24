@@ -108,7 +108,7 @@ postgresql_restore() {
         ## Get ride of existing database connection
         PG_TERMINATE_CONN_DB_START_TIME=$(date +%s)
         log "postgresql connection termination process started on host : ${POSTGRES_HOST} for Database : ${DB}"
-        PG_TERMINATE_CONN_RESULT=$(psql -h ${POSTGRES_HOST} -U ${POSTGRES_USERNAME} -d ${DB} -c "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE pid = pg_backend_pid();")
+        PG_TERMINATE_CONN_RESULT=$(psql -h ${POSTGRES_HOST} -U ${POSTGRES_USERNAME} -d ${DB} -c "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = 'openproject' AND pid <> pg_backend_pid();")
         
         if [ $? -ne 0 ]; then
             PG_TERMINATE_CONN_ELAPSED_TIME=$(( $(date +%s)-${PG_TERMINATE_CONN_DB_START_TIME} ))
