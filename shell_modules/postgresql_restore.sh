@@ -128,6 +128,7 @@ postgresql_restore() {
             return 1
             break
         fi
+    done
 
     PG_RESTORE_SUCCESS=true
 
