@@ -60,9 +60,16 @@ set_pg_credential() {
     chmod 0600 ${PGPASSFILE}
     chown $(id -un) ${PGPASSFILE}
     set PGPASSFILE=$PGPASSFILE
+
+    ## add default line for postgres DB
+    DEFAULT_PGPASS_LINE="${POSTGRES_HOST}:${POSTGRES_PORT}:postgres:${POSTGRES_USERNAME}:${POSTGRES_PASS}"
+    if ! grep -q "$DEFAULT_PGPASS_LINE" "$PGPASSFILE" ; then
+        echo ${DEFAULT_PGPASS_LINE} >> ${PGPASSFILE}
+    fi
+
+    ## add line for each DB
     for DB in ${POSTGRES_DB_LIST}; do
         CREDENTIAL_LINE="${POSTGRES_HOST}:${POSTGRES_PORT}:${DB}:${POSTGRES_USERNAME}:${POSTGRES_PASS}"
-        ## if line doesn't already exist in file write it
         if ! grep -q "$CREDENTIAL_LINE" "$PGPASSFILE" ; then
             echo ${CREDENTIAL_LINE} >> ${PGPASSFILE}
         fi
