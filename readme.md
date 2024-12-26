@@ -2,7 +2,7 @@
 
 ## Description
 
-A dokerized shell script that backup up a postgresql database based on cron, restic, pg_dump.
+A dockerized shell script that backup up a postgresql database based on cron, restic, pg_dump.
 
 🐳 Image is build anb pushed to dockerhub at [postgresql_backup](https://hub.docker.com/repository/docker/tinycompany/postgresql_backup/general)
 
@@ -18,6 +18,10 @@ A dokerized shell script that backup up a postgresql database based on cron, res
 - hadolint
 - check datase working (status) before restore and backup
 - check if latest backup exist before launching backup
+- Finish readme Usage part
+- check database readiness for all database instead of just postgres
+- bats shell test
+- add a list snapshot feature in entrypoint
 
 💖 Credits to :
 - [monlor](https://github.com/monlor/docker-cron) : for cron docker image.
@@ -88,7 +92,7 @@ RESTIC_PASSWORD=""
 
 2. start a new container with restore command :
 ```
-docker run --rm -d
+docker compose exec <backup-container>
 ```
 
 ## Sources :
