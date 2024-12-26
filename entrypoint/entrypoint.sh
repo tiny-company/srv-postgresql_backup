@@ -72,7 +72,7 @@ else
             ;;
         restore)
             if [ "$#" -ge 2 ]; then
-                RESTIC_SNAPSHOT_ID=$2
+                export RESTIC_SNAPSHOT_ID=$2
                 ## debug logs
                 log "====> restic snapshot id args detected as ${RESTIC_SNAPSHOT_ID}"
             fi
