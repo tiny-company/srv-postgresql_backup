@@ -45,7 +45,7 @@ SLEEP_SEC_DURATION=${SLEEP_SEC_DURATION:-86400}
 cron_backup() {
 ### planned backup by calling using backup function and wait with sleep ###
     while true; do
-        ${WORKDIR}/main_postgresql_backup.sh
+        check_recent_backup ${SLEEP_SEC_DURATION} && ${WORKDIR}/main_postgresql_backup.sh
         sleep ${SLEEP_SEC_DURATION}
     done
 }

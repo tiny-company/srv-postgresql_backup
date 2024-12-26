@@ -62,13 +62,29 @@ check_disk_space_availiability(){
 show_latest_snapshot() {
 ### show latest restic snapshot ###
     RESTIC_SNAPSHOT_ID=$(restic snapshots --json | jq -r '.[-1].id')
-    RESTIC_SNAPSHOT_DATA=$(restic snapshots --json | jq ".[] | select(.id == ${RESTIC_SNAPSHOT_ID})")
+    RESTIC_SNAPSHOT_DATA=$(restic snapshots --json |  jq --arg id "$RESTIC_SNAPSHOT_ID" '.[] | select(.id == $id)')
         if [ $? -eq 0 ];then
             log "${RESTIC_SNAPSHOT_DATA}"
         else 
             error "Cannot show backup snapshot"
         fi
     
+}
+
+check_recent_backup() {
+### check if backup was made recently ###
+    LATEST_BACKUP_SEC_DELAY=$1
+    RESTIC_SNAPSHOT_TIME=$(restic snapshots --json | jq --arg id "$RESTIC_SNAPSHOT_ID" '.[] | select(.id == $id) | .time')
+
+    ## convert str time to epoch time
+    DATE_TMP=$(echo "${RESTIC_SNAPSHOT_TIME:0:19}" | sed 's/T/ /')
+    LATEST_BACKUP_DATE=$(date -d "$DATE_TMP" +%s)
+    CURRENT_DATE=$(date +%s)
+    EXPECTED_BACKUP_DATE=$((CURRENT_DATE + LATEST_BACKUP_SEC_DELAY))
+    if [ "$LATEST_BACKUP_DATE" -lt "$EXPECTED_BACKUP_DATE" ]; then
+        warn "previous backup was made before the backup interval, to prevent unwanted new backup creation, this backup is skipped"
+        return 1
+    fi
 }
 
 ####################################################

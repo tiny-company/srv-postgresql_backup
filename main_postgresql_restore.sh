@@ -95,7 +95,7 @@ log "Restore started using restic snapshot id : $RESTIC_SNAPSHOT_ID"
 ## make sure restic restore dir exist
 mkdir -p ${RESTORE_RESTIC_TARGET_DIR}
 
-## checking database readyness
+## checking database readiness
 postgresql_check_readiness || error_exit "$?"
 
 # Validate space availility for the restore process 

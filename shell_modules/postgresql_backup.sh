@@ -42,7 +42,7 @@ postgresql_backup_restic() {
 ### launching postgresql database backup and manage it with restic ###
     PG_DUMP_START_TIME=$(date +%s)
     PG_DUMP_SUCCESS=false
-    # execute pg_dump for each database in list
+    ## execute pg_dump for each database in list
     for DB in ${POSTGRES_DB_LIST}; do
         PG_DUMP_START_TIME=$(date +%s)
         log "postgresql dump process started on host : ${POSTGRES_HOST} for Database : ${DB}"

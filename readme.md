@@ -18,7 +18,6 @@ A dokerized shell script that backup up a postgresql database based on cron, res
 - hadolint
 - check datase working (status) before restore and backup
 - check if latest backup exist before launching backup
-- show restic snapshot id after onetimebackup
 
 💖 Credits to :
 - [monlor](https://github.com/monlor/docker-cron) : for cron docker image.
