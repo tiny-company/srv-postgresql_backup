@@ -25,7 +25,7 @@ backup_failure_message() {
 ### default backup failure message ###
     ELAPSED_TIME=$(( $(date +%s)-${BACKUP_START_TIME} ))
     error "postgresql restore process ended (in error) in $(($ELAPSED_TIME/60)) min $(($ELAPSED_TIME%60)) sec"
-    error "backup failure on ${POSTGRES_HOST}."
+    error_exit "backup failure on ${POSTGRES_HOST}."
 }
 
 ####################################################

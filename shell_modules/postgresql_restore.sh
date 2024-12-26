@@ -54,10 +54,11 @@ restore_restic_backup() {
     ## Restore the snapshot
     log "Restoring the restic snapshot : ${RESTIC_SNAPSHOT_ID}"
     RESTIC_RESTORE_RESULT=$(restic restore "${RESTIC_SNAPSHOT_ID}" --target "${RESTORE_RESTIC_TARGET_DIR}")
-    RESTIC_RESTORE_ELAPSED_TIME=$(( $(date +%s)-${RESTIC_RESTORE_START_TIME} ))
     if [ $? -eq 0 ]; then
+        RESTIC_RESTORE_ELAPSED_TIME=$(( $(date +%s)-${RESTIC_RESTORE_START_TIME} ))
         log "restic restore process ended (in success) in $(($RESTIC_RESTORE_ELAPSED_TIME/60)) min $(($RESTIC_RESTORE_ELAPSED_TIME%60)) sec"
     else
+        RESTIC_RESTORE_ELAPSED_TIME=$(( $(date +%s)-${RESTIC_RESTORE_START_TIME} ))
         error "restic restore process ended (in error) in $(($RESTIC_RESTORE_ELAPSED_TIME/60)) min $(($RESTIC_RESTORE_ELAPSED_TIME%60)) sec"
         error $RESTIC_RESTORE_RESULT
         return 1
@@ -105,8 +106,8 @@ postgresql_restore() {
         PG_DMP_FILE_ELAPSED_TIME=$(( $(date +%s)-${PG_DMP_FILE_DB_START_TIME} ))
         log "postgresql (${DB}) getting dump file process ended (in success) in $(($PG_DMP_FILE_ELAPSED_TIME/60)) min $(($PG_DMP_FILE_ELAPSED_TIME%60)) sec"
 
-        ## Get ride of existing database connection
-        if psql -h ${POSTGRES_HOST} -U ${POSTGRES_USERNAME} -d postgres -tAc "SELECT 1 FROM pg_database WHERE datname='$DB'" | grep -q 1; then
+        ## Get rid of existing database connection
+        if psql -h ${POSTGRES_HOST} -U ${POSTGRES_USERNAME} -d postgres -tAc "SELECT 1 FROM pg_database WHERE datname='$DB';" | grep -q 1; then
             PG_TERMINATE_CONN_DB_START_TIME=$(date +%s)
             log "postgresql connection termination process started on host : ${POSTGRES_HOST} for Database : ${DB}"
             PG_TERMINATE_CONN_RESULT=$(psql -h ${POSTGRES_HOST} -U ${POSTGRES_USERNAME} -d ${DB} -c "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = '${DB}' AND pid <> pg_backend_pid();")
@@ -123,7 +124,25 @@ postgresql_restore() {
             log "postgresql (${DB}) connection termination process ended (in success) in $(($PG_TERMINATE_CONN_ELAPSED_TIME/60)) min $(($PG_TERMINATE_CONN_ELAPSED_TIME%60)) sec"
         fi
 
-
+        ## single user access database to prevent any new connection from other services
+        if psql -h ${POSTGRES_HOST} -U ${POSTGRES_USERNAME} -d postgres -tAc "SELECT 1 FROM pg_database WHERE datname='$DB';" | grep -q 1; then
+            PG_SINGLE_ACCESS_DB_START_TIME=$(date +%s)
+            log "postgresql single access process started on host : ${POSTGRES_HOST} for Database : ${DB}"
+            PG_SINGLE_ACCESS_RESULT=$(psql -h ${POSTGRES_HOST} -U ${POSTGRES_USERNAME} -d ${DB} -c "UPDATE pg_database SET datallowconn = 'false' WHERE datname = '${DB}';")
+            
+            if [ $? -ne 0 ]; then
+                PG_SINGLE_ACCESS_ELAPSED_TIME=$(( $(date +%s)-${PG_SINGLE_ACCESS_DB_START_TIME} ))
+                error "postgresql (${DB}) single access process ended (in error) in $(($PG_SINGLE_ACCESS_ELAPSED_TIME/60)) min $(($PG_SINGLE_ACCESS_ELAPSED_TIME%60)) sec"
+                error $PG_SINGLE_ACCESS_RESULT
+                ## restore access (if failure)
+                postgresql_multiple_user_database_mode
+                PG_RESTORE_SUCCESS=false
+                return 1
+                break
+            fi
+            PG_TERMINATE_CONN_ELAPSED_TIME=$(( $(date +%s)-${PG_SINGLE_ACCESS_DB_START_TIME} ))
+            log "postgresql (${DB}) single access process ended (in success) in $(($PG_SINGLE_ACCESS_ELAPSED_TIME/60)) min $(($PG_SINGLE_ACCESS_ELAPSED_TIME%60)) sec"
+        fi
 
         ## restore database from restic restore
         PG_RESTORE_DB_START_TIME=$(date +%s)
@@ -139,6 +158,10 @@ postgresql_restore() {
         fi
         PG_RESTORE_ELAPSED_TIME=$(( $(date +%s)-${PG_RESTORE_DB_START_TIME} ))
         log "postgresql database ${DB} restore process ended (in success) in $(($PG_RESTORE_ELAPSED_TIME/60)) min $(($PG_RESTORE_ELAPSED_TIME%60)) sec"
+
+        ## restore database access for other services
+        postgresql_multiple_user_database_mode
+
     done
 
     PG_RESTORE_SUCCESS=true

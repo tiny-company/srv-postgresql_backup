@@ -111,7 +111,7 @@ postgresql_check_readiness() {
         if [ ${PG_READY_RETRY_THRESHOLD} -gt 0 ]; then
             warn "database not ready, waiting ${PG_READY_RETRY_WAIT_TIME}s"
             PG_READY_RETRY_THRESHOLD=$((PG_READY_RETRY_THRESHOLD-1))
-            sleep ${PG_READY_RETRY_WAIT_TIME};
+            sleep ${PG_READY_RETRY_WAIT_TIME}
         else
             warn "threshold reached for pg_ready test, database is not available after ${PG_READY_RETRY_THRESHOLD_INITIAL} try"
             break
@@ -125,3 +125,19 @@ postgresql_check_readiness() {
     fi
 
 }
+
+postgresql_multiple_user_database_mode() {
+### set postgresql database access parameter datallowconn to true to enable new conn ###
+    ALLOWCONN_COUNTER=0
+    SLEEP_INIT_VALUE=5
+    until psql -h ${POSTGRES_HOST} -U ${POSTGRES_USERNAME} -d ${DB} -c "UPDATE pg_database SET datallowconn = 'true' WHERE datname = '${DB}';"
+    do
+        ALLOWCONN_COUNTER=$((ALLOWCONN_COUNTER+1))
+        SLEEP_VALUE=$((ALLOWCONN_COUNTER*SLEEP_INIT_VALUE))
+        warn "Error while trying to set database allowconn parameter to 'true'. Database cannot accept new connection ..."
+        warn "Trying to set datallowconn parameter again (attemp number : $ALLOWCONN_COUNTER)"
+        sleep ${SLEEP_VALUE}
+    done
+    log "Database ${DB} parameter datallowconn successfully set to true. Database now allow new connection"
+}
+
