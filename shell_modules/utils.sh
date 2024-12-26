@@ -78,7 +78,7 @@ check_recent_backup() {
     RESTIC_SNAPSHOT_TIME=$(restic snapshots --json | jq --arg id "$RESTIC_SNAPSHOT_ID" '.[] | select(.id == $id) | .time')
 
     ## convert str time to epoch time
-    DATE_TMP=$(echo "${RESTIC_SNAPSHOT_TIME:0:19}" | sed 's/T/ /')
+    DATE_TMP=$(echo "${RESTIC_SNAPSHOT_TIME:0:20}" | sed 's/T/ /')
     LATEST_BACKUP_DATE=$(date -d "$DATE_TMP" +%s)
     CURRENT_DATE=$(date +%s)
     EXPECTED_BACKUP_DATE=$((CURRENT_DATE + LATEST_BACKUP_SEC_DELAY))
@@ -139,7 +139,7 @@ check_database_estimated_size() {
 
 postgresql_check_readiness() {
 ### check if postgresql database is ready using pg_isready ###
-    until pg_isready -q -h ${POSTGRES_HOST} -U ${POSTGRES_USERNAME} -d ${DB}
+    until pg_isready -q -h ${POSTGRES_HOST} -U ${POSTGRES_USERNAME} -d postgres
     do
         if [ ${PG_READY_RETRY_THRESHOLD} -gt 0 ]; then
             warn "database not ready, waiting ${PG_READY_RETRY_WAIT_TIME}s"
