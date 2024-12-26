@@ -79,7 +79,8 @@ else
         *)
             error "Error: Unrecognized command '$1'."
             warn "Available command : "
-            warn "backup"
+            warn "onetime_backup"
+            warn "cron_backup"
             warn "restore <restic_snapshot_id>"
     esac
 

@@ -16,6 +16,9 @@ A dokerized shell script that backup up a postgresql database based on cron, res
 - make sure to handle multiple database backup and restore
 - manage multiple restic repository (directory, S3, ...)
 - hadolint
+- check datase working (status) before restore and backup
+- check if latest backup exist before launching backup
+- show restic snapshot id after onetimebackup
 
 💖 Credits to :
 - [monlor](https://github.com/monlor/docker-cron) : for cron docker image.

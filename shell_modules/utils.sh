@@ -14,7 +14,7 @@
 ####################################################
 
 ### postgresql database parameters
-POSTGRESQL_DEFAULT_DB=("postgres" "template0" "template1")
+POSTGRESQL_DEFAULT_DB=("postgres")
 
 ####################################################
 #                 Common utils function
