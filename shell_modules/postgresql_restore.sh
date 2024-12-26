@@ -140,7 +140,7 @@ postgresql_restore() {
                 return 1
                 break
             fi
-            PG_TERMINATE_CONN_ELAPSED_TIME=$(( $(date +%s)-${PG_SINGLE_ACCESS_DB_START_TIME} ))
+            PG_SINGLE_ACCESS_ELAPSED_TIME=$(( $(date +%s)-${PG_SINGLE_ACCESS_DB_START_TIME} ))
             log "postgresql (${DB}) single access process ended (in success) in $(($PG_SINGLE_ACCESS_ELAPSED_TIME/60)) min $(($PG_SINGLE_ACCESS_ELAPSED_TIME%60)) sec"
         fi
 
