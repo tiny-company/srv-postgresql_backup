@@ -89,21 +89,32 @@ if [ $? -ne 0 ]; then
 fi
 
 log " ==> new postgresql backup process started <=="
+
+## checking database readiness
 postgresql_check_readiness || error_exit "$?"
+
+## validate backup path existence
 create_backup_path || error_exit "$?"
+
+## set postgresql credentials
 set_pg_credential || error_exit "$?"
 
+## check space availibility feature
 if ${FEATURE_SIZE_CHECK} ; then
     check_database_estimated_size || backup_failure_message
     check_disk_space_availiability || backup_failure_message
 fi
 
+## restic repository init
 restic snapshots > /dev/null || restic_repo_init
+
+## database backup using pg_dump and restic
 postgresql_backup_restic || error_exit "$?"
 
 ## show the latest restic backup snapshot
 show_latest_snapshot
 
+## check postgresql database readiness after backup
 if ${PG_DUMP_SUCCESS} ; then
     postgresql_check_readiness || error_exit "$?"
 fi
