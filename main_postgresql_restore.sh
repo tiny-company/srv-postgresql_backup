@@ -86,7 +86,7 @@ log " ==> new postgresql restore process started <=="
 if [ -z "${RESTIC_SNAPSHOT_ID+x}" ]; then
     RESTIC_SNAPSHOT_ID=$(restic snapshots --json | jq -r '.[-1].id')
     ## debug logs
-    log "====> var 'RESTIC_SNAPSHOT_ID' was not set, though reset it to latest snapshot id : ${RESTIC_SNAPSHOT_ID}"
+    log "====> var RESTIC_SNAPSHOT_ID was not set, though reset it to latest snapshot id : ${RESTIC_SNAPSHOT_ID}"
     if [ -z "$RESTIC_SNAPSHOT_ID" ]; then
         error "No snapshots found in restic repository : $RESTIC_REPOSITORY"
         restore_failure_message
@@ -124,7 +124,7 @@ if ${PG_RESTORE_SUCCESS} ; then
 fi
 
 ## helpfull message about restore
-log "Restoration process has terminated existing connection to database
+log "Restoration process has terminated existing connection to database"
 
 ELAPSED_TIME=$(( $(date +%s)-${START_TIME} ))
 log "postgresql restore process finished in $(($ELAPSED_TIME/60)) min $(($ELAPSED_TIME%60)) sec"
