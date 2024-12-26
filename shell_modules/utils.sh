@@ -78,7 +78,7 @@ check_recent_backup() {
     RESTIC_SNAPSHOT_TIME=$(restic snapshots --json | jq --arg id "$RESTIC_SNAPSHOT_ID" '.[] | select(.id == $id) | .time')
 
     ## convert str time to epoch time
-    DATE_TMP=$(echo "${RESTIC_SNAPSHOT_TIME:0:20}" | sed 's/T/ /')
+    DATE_TMP=$(echo "${RESTIC_SNAPSHOT_TIME:1:20}" | sed 's/T/ /')
     LATEST_BACKUP_DATE=$(date -d "$DATE_TMP" +%s)
     CURRENT_DATE=$(date +%s)
     EXPECTED_BACKUP_DATE=$((CURRENT_DATE + LATEST_BACKUP_SEC_DELAY))
