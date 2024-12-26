@@ -60,6 +60,7 @@ postgresql_backup_restic() {
             error_exit "${PG_DUMP_RESULT}"
 
         fi
+
         ## backup pg_dump output using restic
         if ${PG_DUMP_SUCCESS};then
             RESTIC_START_TIME=$(date +%s)
@@ -67,7 +68,9 @@ postgresql_backup_restic() {
             if [ $? -eq 0 ];then
                 RESTIC_ELAPSED_TIME=$(( $(date +%s)-${RESTIC_START_TIME} ))
                 log "restic process ended (in success) for Database : ${DB} in in $(($RESTIC_ELAPSED_TIME/60)) min $(($RESTIC_ELAPSED_TIME%60)) sec"
+                remove_pg_dump_output
             else
+                remove_pg_dump_output
                 ELAPSED_TIME=$(( $(date +%s)-${RESTIC_START_TIME} ))
                 error "restic process ended (in error) for Database : ${DB} in $(($ELAPSED_TIME/60)) min $(($ELAPSED_TIME%60)) sec"
                 error "backup failure on ${POSTGRES_HOST} for database: ${DB}"

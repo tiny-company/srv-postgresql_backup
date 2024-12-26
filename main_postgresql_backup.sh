@@ -101,6 +101,9 @@ fi
 restic snapshots > /dev/null || restic_repo_init
 postgresql_backup_restic || error_exit "$?"
 
+## show the latest restic backup snapshot
+show_latest_snapshot
+
 if ${PG_DUMP_SUCCESS} ; then
     postgresql_check_readiness || error_exit "$?"
 fi

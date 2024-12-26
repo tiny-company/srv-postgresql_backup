@@ -56,6 +56,22 @@ check_disk_space_availiability(){
 }
 
 ####################################################
+#                 Restic utils function
+####################################################
+
+show_latest_snapshot() {
+### show latest restic snapshot ###
+    RESTIC_SNAPSHOT_ID=$(restic snapshots --json | jq -r '.[-1].id')
+    RESTIC_SNAPSHOT_DATA=$(restic snapshots --json | jq ".[] | select(.id == ${RESTIC_SNAPSHOT_ID})")
+        if [ $? -eq 0 ];then
+            log "${RESTIC_SNAPSHOT_DATA}"
+        else 
+            error "Cannot show backup snapshot"
+        fi
+    
+}
+
+####################################################
 #                 Postgresql utils function
 ####################################################
 
@@ -141,3 +157,15 @@ postgresql_multiple_user_database_mode() {
     log "Database ${DB} parameter datallowconn successfully set to true. Database now allow new connection"
 }
 
+remove_pg_dump_output() {
+### remove pg_dump after backup export ###
+    if [ -f ${FILENAME} ]; then
+        rm -rf ${FILENAME}
+        if [ $? -eq 0 ];then
+            log "temp pg_dump data successfully deleted"
+        else
+            warn "error while deleting pg_dump file : ${FILENAME}."
+        fi
+    fi
+
+}
