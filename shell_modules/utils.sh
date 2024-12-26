@@ -151,7 +151,7 @@ postgresql_check_readiness() {
         fi
     done
 
-    if pg_isready -q -h ${POSTGRES_HOST} -U ${POSTGRES_USERNAME} -d ${DB}  ; then
+    if pg_isready -q -h ${POSTGRES_HOST} -U ${POSTGRES_USERNAME} -d postgres  ; then
         log "database is ready to receive any connection (pg_ready success)"
     else
         warn "database left unavailable for connection (pg_ready failure)"
