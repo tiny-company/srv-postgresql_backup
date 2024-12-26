@@ -74,6 +74,7 @@ show_latest_snapshot() {
 check_recent_backup() {
 ### check if backup was made recently ###
     LATEST_BACKUP_SEC_DELAY=$1
+    RESTIC_SNAPSHOT_ID=$(restic snapshots --json | jq -r '.[-1].id')
     RESTIC_SNAPSHOT_TIME=$(restic snapshots --json | jq --arg id "$RESTIC_SNAPSHOT_ID" '.[] | select(.id == $id) | .time')
 
     ## convert str time to epoch time
