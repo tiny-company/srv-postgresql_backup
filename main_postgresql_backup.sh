@@ -89,6 +89,7 @@ if [ $? -ne 0 ]; then
 fi
 
 log " ==> new postgresql backup process started <=="
+postgresql_check_readiness || error_exit "$?"
 create_backup_path || error_exit "$?"
 set_pg_credential || error_exit "$?"
 
