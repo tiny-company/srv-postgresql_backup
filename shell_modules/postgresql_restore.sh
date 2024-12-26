@@ -152,6 +152,8 @@ postgresql_restore() {
             PG_RESTORE_ELAPSED_TIME=$(( $(date +%s)-${PG_RESTORE_DB_START_TIME} ))
             error "postgresql database (${DB}) restore process ended (in error) in $(($PG_RESTORE_ELAPSED_TIME/60)) min $(($PG_RESTORE_ELAPSED_TIME%60)) sec"
             error $PG_RESTORE_RESULT
+            ## restore access (if failure)
+            postgresql_multiple_user_database_mode
             PG_RESTORE_SUCCESS=false
             return 1
             break
