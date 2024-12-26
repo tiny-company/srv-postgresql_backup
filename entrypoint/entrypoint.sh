@@ -71,7 +71,7 @@ else
             cron_backup
             ;;
         restore)
-            if [ $# -ge 2 ]; then
+            if [ "$#" -ge 2 ]; then
                 RESTIC_SNAPSHOT_ID=$2
                 ## debug logs
                 log "====> restic snapshot id args detected as ${RESTIC_SNAPSHOT_ID}"
