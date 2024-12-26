@@ -59,6 +59,7 @@ BACKUP_POSTGRES_DIR_MOUNT_POINT=${BACKUP_POSTGRES_DIR_MOUNT_POINT:-/}
 RESTORE_RESTIC_TARGET_DIR=${RESTORE_RESTIC_TARGET_DIR:-/restore}
 RESTORE_POSTGRES_DB_LIST=${RESTORE_POSTGRES_DB_LIST:-$POSTGRES_DB_LIST}
 RESTORE_PARALELL_THREAD=${RESTORE_PARALELL_THREAD:-1}
+RESTIC_SNAPSHOT_ID=${RESTIC_SNAPSHOT_ID:-}
 
 ####################################################
 #                    Dependencies
@@ -83,7 +84,7 @@ fi
 
 log " ==> new postgresql restore process started <=="
 ## Get snapshot_id from user input or set it to latest by default
-if [ -z "${RESTIC_SNAPSHOT_ID+x}" ]; then
+if [ -z "${RESTIC_SNAPSHOT_ID}" ]; then
     RESTIC_SNAPSHOT_ID=$(restic snapshots --json | jq -r '.[-1].id')
     ## debug logs
     log "====> var RESTIC_SNAPSHOT_ID was not set, though reset it to latest snapshot id : ${RESTIC_SNAPSHOT_ID}"
