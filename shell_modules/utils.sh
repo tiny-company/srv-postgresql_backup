@@ -62,9 +62,9 @@ check_disk_space_availiability(){
 show_latest_snapshot() {
 ### show latest restic snapshot ###
     RESTIC_SNAPSHOT_ID=$(restic snapshots --json | jq -r '.[-1].id')
-    RESTIC_SNAPSHOT_DATA=$(restic snapshots --json |  jq --arg id "$RESTIC_SNAPSHOT_ID" '.[] | select(.id == $id)')
+    RESTIC_SNAPSHOT_DATA=$(restic snapshots --json |  jq --arg id "$RESTIC_SNAPSHOT_ID" '.[] | select(.id == $id) | .short_id' )
         if [ $? -eq 0 ];then
-            log "${RESTIC_SNAPSHOT_DATA}"
+            log "backup snapshot : ${RESTIC_SNAPSHOT_DATA}"
         else 
             error "Cannot show backup snapshot"
         fi
